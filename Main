@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Calling the Shots</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #F0D878;
+    --gold-dark: #8B6914;
+    --black: #0a0a0a;
+    --dark: #141414;
+    --dark2: #1c1c1c;
+    --white: #FFFFFF;
+    --champagne: #F5F0E8;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--black);
+    font-family: 'Jost', sans-serif;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  /* ===================== */
+  /* SCREEN SYSTEM         */
+  /* ===================== */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    z-index: 1;
+  }
+
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+    z-index: 2;
+  }
+
+  /* ===================== */
+  /* WELCOME SCREEN        */
+  /* ===================== */
+  #welcome {
+    background: var(--dark);
+    overflow: hidden;
+  }
+
+  /* Beam */
+  .beam {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(
+      from 270deg at 50% 100%,
+      transparent 55deg,
+      rgba(201,168,76,0.06) 70deg,
+      rgba(201,168,76,0.09) 90deg,
+      rgba(201,168,76,0.06) 110deg,
+      transparent 125deg
+    );
+    filter: blur(22px);
+    animation: beamPulse 4s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes beamPulse {
+    0%,100% { opacity: 0.8; }
+    50% { opacity: 1.3; }
+  }
+
+  .light-point {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 6px;
+    background: #fff8e0;
+    border-radius: 50%;
+    box-shadow:
+      0 0 10px 5px rgba(255,248,200,1),
+      0 0 35px 14px rgba(201,168,76,0.8),
+      0 0 80px 30px rgba(201,168,76,0.3);
+    animation: lightPulse 4s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  @keyframes lightPulse {
+    0%,100% { box-shadow: 0 0 10px 5px rgba(255,248,200,1), 0 0 35px 14px rgba(201,168,76,0.8), 0 0 80px 30px rgba(201,168,76,0.3); }
+    50% { box-shadow: 0 0 16px 8px rgba(255,248,200,1), 0 0 55px 22px rgba(201,168,76,0.9), 0 0 120px 50px rgba(201,168,76,0.4); }
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: rgba(201,168,76,0.7);
+    border-radius: 50%;
+    z-index: 2;
+    animation: rise 5s infinite ease-out;
+  }
+
+  @keyframes rise {
+    0% { opacity: 0; transform: translateY(0) translateX(0); }
+    15% { opacity: 1; }
+    80% { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(-350px) translateX(var(--drift)); }
+  }
+
+  .p1 { bottom: 4px; left: calc(50% - 2px); --drift: -20px; animation-delay: 0s; animation-duration: 4s; }
+  .p2 { bottom: 4px; left: calc(50% + 2px); --drift: 25px; animation-delay: 1.2s; animation-duration: 5s; }
+  .p3 { bottom: 6px; left: 50%; --drift: -10px; animation-delay: 2.4s; animation-duration: 3.8s; }
+  .p4 { bottom: 3px; left: calc(50% - 1px); --drift: 15px; animation-delay: 0.6s; animation-duration: 4.5s; }
+  .p5 { bottom: 5px; left: calc(50% + 1px); --drift: -30px; animation-delay: 1.8s; animation-duration: 4.2s; }
+  .p6 { bottom: 4px; left: calc(50% + 3px); --drift: 10px; animation-delay: 3s; animation-duration: 4s; }
+  .p7 { bottom: 6px; left: calc(50% - 3px); --drift: -15px; animation-delay: 3.5s; animation-duration: 5s; }
+
+  .welcome-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10vh;
+    animation: fadeInUp 2s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo-script {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(52px, 8vw, 96px);
+    background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold) 25%, var(--gold-light) 50%, var(--gold) 75%, var(--gold-dark) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 25px rgba(201,168,76,0.7));
+    line-height: 1.4;
+    white-space: nowrap;
+    animation: shimmer 4s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+  }
+
+  .since-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeIn 3s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeIn {
+    0%,40% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .since-line {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .since-line.r { background: linear-gradient(90deg, var(--gold), transparent); }
+
+  .since-text {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(9px, 1.2vw, 13px);
+    letter-spacing: 7px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  /* Buttons */
+  .welcome-buttons {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 0 40px;
+    width: 100%;
+    max-width: 760px;
+    animation: fadeInUp 2.5s ease forwards;
+    opacity: 0;
+  }
+
+  .main-btn {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .main-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .main-btn:active::before { opacity: 1; }
+  .main-btn:active { border-color: var(--gold); transform: scale(0.98); }
+
+  .btn-top-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .btn-icon {
+    font-size: 42px;
+    line-height: 1;
+  }
+
+  .btn-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(13px, 1.8vw, 18px);
+    letter-spacing: 3px;
+    color: var(--white);
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .btn-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-align: center;
+    font-weight: 300;
+  }
+
+  /* ===================== */
+  /* SHARED SCREEN STYLES  */
+  /* ===================== */
+  .screen-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    z-index: 10;
+  }
+
+  .screen-logo {
+    font-family: 'Great Vibes', cursive;
+    font-size: 28px;
+    color: var(--gold);
+  }
+
+  .back-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(201,168,76,0.7);
+    text-transform: uppercase;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    border: 1px solid rgba(201,168,76,0.3);
+    transition: all 0.3s ease;
+  }
+
+  .back-btn:active { color: var(--gold); border-color: var(--gold); }
+
+  .screen-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+    padding: 100px 40px 40px;
+    gap: 28px;
+  }
+
+  .screen-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(18px, 2.5vw, 28px);
+    letter-spacing: 4px;
+    color: var(--white);
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .screen-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: clamp(13px, 1.5vw, 16px);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    letter-spacing: 1px;
+    font-weight: 300;
+  }
+
+  .gold-divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* ===================== */
+  /* VIDEO SCREEN          */
+  /* ===================== */
+  .prompt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .prompt-btn {
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.25);
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+  }
+
+  .prompt-btn.selected {
+    background: rgba(201,168,76,0.12);
+    border-color: var(--gold);
+  }
+
+  .prompt-btn:active { transform: scale(0.98); }
+
+  .prompt-number {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .prompt-text {
+    font-family: 'Jost', sans-serif;
+    font-size: clamp(12px, 1.4vw, 15px);
+    color: var(--white);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* Record screen */
+  .video-preview {
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16/9;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .video-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  .record-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 20px;
+    background: linear-gradient(transparent 50%, rgba(0,0,0,0.5));
+  }
+
+  .timer-bar {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .timer-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  .timer-text {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .rec-dot {
+    width: 10px; height: 10px;
+    background: #ff3b30;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ===================== */
+  /* PHOTO SCREEN          */
+  /* ===================== */
+  .photo-preview {
+    width: 100%;
+    max-width: 560px;
+    aspect-ratio: 4/3;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .photo-preview video,
+  .photo-preview canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  .photo-countdown {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 120px;
+    color: var(--white);
+    text-shadow: 0 0 40px rgba(201,168,76,0.8);
+    background: rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .photo-strip {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .strip-photo {
+    flex: 1;
+    aspect-ratio: 4/3;
+    background: #111;
+    border: 1px solid rgba(201,168,76,0.2);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .strip-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  .strip-number {
+    position: absolute;
+    bottom: 4px;
+    right: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+  }
+
+  /* ===================== */
+  /* PHONE INPUT           */
+  /* ===================== */
+  .phone-input-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .phone-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(201,168,76,0.5);
+    padding: 16px 0;
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    letter-spacing: 6px;
+    color: var(--white);
+    text-align: center;
+    outline: none;
+  }
+
+  .phone-input::placeholder {
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 3px;
+    font-size: 16px;
+  }
+
+  /* ===================== */
+  /* BUTTONS               */
+  /* ===================== */
+  .gold-btn {
+    background: var(--gold);
+    border: none;
+    padding: 18px 48px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--black);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+  }
+
+  .gold-btn:active { transform: scale(0.97); background: var(--gold-light); }
+
+  .outline-btn {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.5);
+    padding: 16px 40px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .outline-btn:active { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+
+  /* ===================== */
+  /* THANK YOU SCREEN      */
+  /* ===================== */
+  #thankyou {
+    background: var(--dark);
+    overflow: hidden;
+  }
+
+  .thankyou-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .thankyou-icon {
+    font-size: 64px;
+    animation: popIn 0.5s ease forwards;
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .thankyou-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(48px, 7vw, 80px);
+    color: var(--gold);
+    filter: drop-shadow(0 0 20px rgba(201,168,76,0.5));
+  }
+
+  .thankyou-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 2px;
+    font-weight: 300;
+  }
+
+  .countdown-back {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(201,168,76,0.4);
+    text-transform: uppercase;
+    margin-top: 20px;
+  }
+
+  /* ===================== */
+  /* COUNTDOWN OVERLAY     */
+  /* ===================== */
+  #countdown-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  #countdown-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .countdown-number {
+    font-family: 'Cinzel', serif;
+    font-size: 200px;
+    color: var(--white);
+    text-shadow: 0 0 60px rgba(201,168,76,0.8);
+    animation: countPop 0.8s ease forwards;
+  }
+
+  @keyframes countPop {
+    0% { transform: scale(1.5); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Flash effect */
+  #flash {
+    position: fixed;
+    inset: 0;
+    background: white;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #flash.active {
+    animation: flashAnim 0.4s ease forwards;
+  }
+
+  @keyframes flashAnim {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Progress dots */
+  .photo-dots {
+    display: flex;
+    gap: 10px;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.2);
+    border: 1px solid rgba(201,168,76,0.4);
+    transition: background 0.3s ease;
+  }
+
+  .dot.filled { background: var(--gold); }
+
+  /* Loading state */
+  .loading {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* Prompt display in record screen */
+  .active-prompt {
+    font-family: 'Jost', sans-serif;
+    font-size: clamp(14px, 1.8vw, 18px);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    font-style: italic;
+    font-weight: 300;
+    max-width: 500px;
+    line-height: 1.6;
+    border-left: 2px solid var(--gold);
+    padding-left: 16px;
+  }
+
+  .row { display: flex; gap: 16px; align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- FLASH EFFECT -->
+<div id="flash"></div>
+
+<!-- COUNTDOWN OVERLAY -->
+<div id="countdown-overlay">
+  <div class="countdown-number" id="countdown-num">3</div>
+</div>
+
+<!-- ==================== -->
+<!-- SCREEN 1: WELCOME    -->
+<!-- ==================== -->
+<div class="screen active" id="welcome">
+  <div class="beam"></div>
+  <div class="light-point"></div>
+  <div class="vignette"></div>
+  <div class="particle p1"></div>
+  <div class="particle p2"></div>
+  <div class="particle p3"></div>
+  <div class="particle p4"></div>
+  <div class="particle p5"></div>
+  <div class="particle p6"></div>
+  <div class="particle p7"></div>
+
+  <div class="welcome-content">
+    <div class="logo-script">Calling the Shots</div>
+    <div class="since-row">
+      <div class="since-line"></div>
+      <div class="since-text">Since 2026</div>
+      <div class="since-line r"></div>
+    </div>
+  </div>
+
+  <div class="welcome-buttons">
+    <button class="main-btn" onclick="showScreen('video-prompts')">
+      <div class="btn-top-line"></div>
+      <div class="btn-icon">🎥</div>
+      <div class="btn-title">Leave a Message</div>
+      <div class="btn-sub">Record a video for the couple</div>
+    </button>
+    <button class="main-btn" onclick="startPhotoSession()">
+      <div class="btn-top-line"></div>
+      <div class="btn-icon">📸</div>
+      <div class="btn-title">Take Photos</div>
+      <div class="btn-sub">4 shots + printed strip</div>
+    </button>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- SCREEN 2: VIDEO PROMPTS  -->
+<!-- ======================== -->
+<div class="screen" id="video-prompts">
+  <div class="screen-header">
+    <div class="screen-logo">Calling the Shots</div>
+    <button class="back-btn" onclick="showScreen('welcome')">← Back</button>
+  </div>
+  <div class="screen-body">
+    <div class="screen-title">Choose Your Prompt</div>
+    <div class="screen-sub">What would you like to talk about?</div>
+    <div class="gold-divider"></div>
+    <div class="prompt-grid" id="prompt-grid">
+      <div class="prompt-btn" onclick="selectPrompt(0, this)">
+        <div class="prompt-number">01</div>
+        <div class="prompt-text">Share a favorite memory with the couple</div>
+      </div>
+      <div class="prompt-btn" onclick="selectPrompt(1, this)">
+        <div class="prompt-number">02</div>
+        <div class="prompt-text">What's your best advice for their marriage?</div>
+      </div>
+      <div class="prompt-btn" onclick="selectPrompt(2, this)">
+        <div class="prompt-number">03</div>
+        <div class="prompt-text">Share a wish for their future together</div>
+      </div>
+      <div class="prompt-btn" onclick="selectPrompt(3, this)">
+        <div class="prompt-number">04</div>
+        <div class="prompt-text">Say whatever is in your heart right now</div>
+      </div>
+    </div>
+    <button class="gold-btn" id="start-record-btn" onclick="showScreen('video-record')" style="opacity:0.3;pointer-events:none;">
+      Start Recording
+    </button>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- SCREEN 3: VIDEO RECORD   -->
+<!-- ======================== -->
+<div class="screen" id="video-record">
+  <div class="screen-header">
+    <div class="screen-logo">Calling the Shots</div>
+    <button class="back-btn" onclick="stopRecording(); showScreen('video-prompts')">← Back</button>
+  </div>
+  <div class="screen-body">
+    <div class="active-prompt" id="active-prompt-text">"Share a favorite memory with the couple"</div>
+    <div class="video-preview">
+      <video id="record-video" autoplay muted playsinline></video>
+      <div class="record-overlay">
+        <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+        <div class="timer-text" id="timer-text"><span class="rec-dot" id="rec-dot" style="display:none"></span><span id="timer-display">00:30</span></div>
+      </div>
+    </div>
+    <div class="row">
+      <button class="gold-btn" id="record-btn" onclick="toggleRecording()">Start Recording</button>
+      <button class="outline-btn" id="submit-video-btn" onclick="submitVideo()" style="display:none">Submit Message</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- SCREEN 4: PHOTO BOOTH    -->
+<!-- ======================== -->
+<div class="screen" id="photo-booth">
+  <div class="screen-header">
+    <div class="screen-logo">Calling the Shots</div>
+    <button class="back-btn" onclick="stopCamera(); showScreen('welcome')">← Back</button>
+  </div>
+  <div class="screen-body">
+    <div class="screen-title" id="photo-screen-title">Get Ready!</div>
+    <div class="photo-dots">
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot" id="dot-3"></div>
+      <div class="dot" id="dot-4"></div>
+    </div>
+    <div class="photo-preview">
+      <video id="photo-video" autoplay muted playsinline></video>
+      <canvas id="photo-canvas" style="display:none"></canvas>
+      <div class="photo-countdown" id="photo-countdown"></div>
+    </div>
+    <div class="photo-strip" id="photo-strip">
+      <div class="strip-photo" id="ph1"><div class="strip-number">1</div></div>
+      <div class="strip-photo" id="ph2"><div class="strip-number">2</div></div>
+      <div class="strip-photo" id="ph3"><div class="strip-number">3</div></div>
+      <div class="strip-photo" id="ph4"><div class="strip-number">4</div></div>
+    </div>
+    <button class="gold-btn" id="photo-action-btn" onclick="runPhotoSession()">Take Photos</button>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- SCREEN 5: PHONE NUMBER   -->
+<!-- ======================== -->
+<div class="screen" id="phone-screen">
+  <div class="screen-header">
+    <div class="screen-logo">Calling the Shots</div>
+  </div>
+  <div class="screen-body">
+    <div class="screen-title">Get Your Photos!</div>
+    <div class="screen-sub">Enter your number and we'll text your strip</div>
+    <div class="gold-divider"></div>
+    <div class="phone-input-wrap">
+      <input class="phone-input" type="tel" id="phone-input" placeholder="(555) 000-0000" maxlength="14" oninput="formatPhone(this)">
+      <div class="row">
+        <button class="outline-btn" onclick="skipPhone()">Skip</button>
+        <button class="gold-btn" onclick="sendPhotos()">Send & Print</button>
+      </div>
+    </div>
+    <div class="screen-sub" style="font-size:12px;margin-top:8px;">Your photos are always saved for the couple 💛</div>
+  </div>
+</div>
+
+<!-- ======================== -->
+<!-- SCREEN 6: THANK YOU      -->
+<!-- ======================== -->
+<div class="screen" id="thankyou">
+  <div class="beam"></div>
+  <div class="light-point"></div>
+  <div class="vignette"></div>
+
+  <div class="thankyou-content">
+    <div class="thankyou-icon" id="thankyou-icon">🥂</div>
+    <div class="thankyou-title">Thank You!</div>
+    <div class="screen-sub" id="thankyou-message">Your message has been saved for the couple.</div>
+    <div class="gold-divider"></div>
+    <div class="countdown-back" id="countdown-back">Returning in 10...</div>
+  </div>
+</div>
+
+<script>
+  // =====================
+  // STATE
+  // =====================
+  let selectedPromptIndex = 0;
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let recordingTimer = null;
+  let recordingSeconds = 30;
+  let isRecording = false;
+  let photoStream = null;
+  let capturedPhotos = [];
+  const MAX_PHOTOS = 4;
+
+  const prompts = [
+    "Share a favorite memory with the couple",
+    "What's your best advice for their marriage?",
+    "Share a wish for their future together",
+    "Say whatever is in your heart right now"
+  ];
+
+  // =====================
+  // SCREEN NAV
+  // =====================
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+
+    if (id === 'video-record') startCamera('record-video');
+    if (id === 'video-prompts') resetVideoUI();
+  }
+
+  // =====================
+  // PROMPT SELECTION
+  // =====================
+  function selectPrompt(index, el) {
+    document.querySelectorAll('.prompt-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPromptIndex = index;
+    document.getElementById('active-prompt-text').textContent = `"${prompts[index]}"`;
+    const btn = document.getElementById('start-record-btn');
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'all';
+  }
+
+  // =====================
+  // CAMERA
+  // =====================
+  async function startCamera(videoId) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: videoId === 'record-video'
+      });
+      const video = document.getElementById(videoId);
+      video.srcObject = stream;
+      if (videoId === 'photo-video') photoStream = stream;
+      return stream;
+    } catch(e) {
+      console.error('Camera error:', e);
+    }
+  }
+
+  function stopCamera() {
+    if (photoStream) {
+      photoStream.getTracks().forEach(t => t.stop());
+      photoStream = null;
+    }
+  }
+
+  // =====================
+  // VIDEO RECORDING
+  // =====================
+  async function toggleRecording() {
+    if (!isRecording) {
+      await startVideoRecording();
+    } else {
+      stopRecording();
+    }
+  }
+
+  async function startVideoRecording() {
+    recordedChunks = [];
+    const stream = document.getElementById('record-video').srcObject;
+    if (!stream) return;
+
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+    mediaRecorder.onstop = () => {
+      document.getElementById('submit-video-btn').style.display = 'block';
+    };
+    mediaRecorder.start();
+    isRecording = true;
+
+    document.getElementById('record-btn').textContent = 'Stop Recording';
+    document.getElementById('rec-dot').style.display = 'inline-block';
+
+    recordingSeconds = 30;
+    updateTimer();
+    recordingTimer = setInterval(() => {
+      recordingSeconds--;
+      updateTimer();
+      if (recordingSeconds <= 0) stopRecording();
+    }, 1000);
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    clearInterval(recordingTimer);
+    isRecording = false;
+    document.getElementById('record-btn').textContent = 'Re-record';
+    document.getElementById('rec-dot').style.display = 'none';
+    document.getElementById('timer-fill').style.width = '0%';
+    document.getElementById('timer-display').textContent = '00:30';
+  }
+
+  function updateTimer() {
+    const pct = ((30 - recordingSeconds) / 30) * 100;
+    document.getElementById('timer-fill').style.width = pct + '%';
+    const s = recordingSeconds < 10 ? '0' + recordingSeconds : recordingSeconds;
+    document.getElementById('timer-display').textContent = `00:${s}`;
+  }
+
+  function resetVideoUI() {
+    document.getElementById('start-record-btn').style.opacity = '0.3';
+    document.getElementById('start-record-btn').style.pointerEvents = 'none';
+    document.querySelectorAll('.prompt-btn').forEach(b => b.classList.remove('selected'));
+  }
+
+  function submitVideo() {
+    // Save video blob
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    // In production: upload to Google Drive via API
+    console.log('Video saved:', blob.size, 'bytes');
+    stopRecording();
+    showThankyou('video');
+  }
+
+  // =====================
+  // PHOTO BOOTH
+  // =====================
+  async function startPhotoSession() {
+    capturedPhotos = [];
+    resetPhotoUI();
+    showScreen('photo-booth');
+    await startCamera('photo-video');
+  }
+
+  function resetPhotoUI() {
+    for (let i = 1; i <= 4; i++) {
+      const ph = document.getElementById('ph' + i);
+      ph.innerHTML = `<div class="strip-number">${i}</div>`;
+    }
+    document.querySelectorAll('.dot').forEach(d => d.classList.remove('filled'));
+    document.getElementById('photo-screen-title').textContent = 'Get Ready!';
+    document.getElementById('photo-action-btn').style.display = 'block';
+    document.getElementById('photo-action-btn').textContent = 'Take Photos';
+  }
+
+  async function runPhotoSession() {
+    document.getElementById('photo-action-btn').style.display = 'none';
+    capturedPhotos = [];
+
+    for (let i = 0; i < MAX_PHOTOS; i++) {
+      document.getElementById('photo-screen-title').textContent = `Photo ${i + 1} of 4`;
+      await countdown(3);
+      capturePhoto(i);
+      await sleep(800);
+    }
+
+    document.getElementById('photo-screen-title').textContent = 'Looking good! 🎉';
+    stopCamera();
+    await sleep(1000);
+    showScreen('phone-screen');
+  }
+
+  function capturePhoto(index) {
+    const video = document.getElementById('photo-video');
+    const canvas = document.getElementById('photo-canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, -canvas.width, 0);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    capturedPhotos.push(dataUrl);
+
+    // Show in strip
+    const ph = document.getElementById('ph' + (index + 1));
+    ph.innerHTML = `<img src="${dataUrl}"><div class="strip-number">${index + 1}</div>`;
+    document.getElementById('dot-' + (index + 1)).classList.add('filled');
+
+    // Flash
+    triggerFlash();
+  }
+
+  function triggerFlash() {
+    const flash = document.getElementById('flash');
+    flash.classList.add('active');
+    setTimeout(() => flash.classList.remove('active'), 400);
+  }
+
+  async function countdown(seconds) {
+    const overlay = document.getElementById('countdown-overlay');
+    const num = document.getElementById('countdown-num');
+    overlay.classList.add('active');
+
+    for (let i = seconds; i >= 1; i--) {
+      num.textContent = i;
+      num.style.animation = 'none';
+      num.offsetHeight; // reflow
+      num.style.animation = 'countPop 0.8s ease forwards';
+      await sleep(900);
+    }
+
+    overlay.classList.remove('active');
+    await sleep(100);
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // =====================
+  // PHONE + SEND
+  // =====================
+  function formatPhone(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val.length >= 6) val = `(${val.slice(0,3)}) ${val.slice(3,6)}-${val.slice(6,10)}`;
+    else if (val.length >= 3) val = `(${val.slice(0,3)}) ${val.slice(3)}`;
+    input.value = val;
+  }
+
+  function sendPhotos() {
+    const phone = document.getElementById('phone-input').value;
+    // In production: send via Twilio + save to Google Drive
+    console.log('Sending photos to:', phone);
+    console.log('Photos:', capturedPhotos.length);
+    showThankyou('photo');
+  }
+
+  function skipPhone() {
+    // Save to cloud only
+    console.log('Saving to cloud only:', capturedPhotos.length, 'photos');
+    showThankyou('photo');
+  }
+
+  // =====================
+  // THANK YOU
+  // =====================
+  function showThankyou(type) {
+    if (type === 'video') {
+      document.getElementById('thankyou-icon').textContent = '🎥';
+      document.getElementById('thankyou-message').textContent = 'Your message has been saved for the couple.';
+    } else {
+      document.getElementById('thankyou-icon').textContent = '📸';
+      document.getElementById('thankyou-message').textContent = 'Your photos have been printed and sent!';
+    }
+    showScreen('thankyou');
+    startReturnCountdown();
+  }
+
+  function startReturnCountdown() {
+    let seconds = 10;
+    const el = document.getElementById('countdown-back');
+    const interval = setInterval(() => {
+      seconds--;
+      el.textContent = `Returning in ${seconds}...`;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        showScreen('welcome');
+      }
+    }, 1000);
+  }
+</script>
+</body>
+</html>
