@@ -443,8 +443,8 @@
   /* ===================== */
   .photo-preview {
     width: 100%;
-    max-width: 600px;
-    aspect-ratio: 4/3;
+    flex: 1;
+    min-height: 0;
     background: #000;
     position: relative;
     overflow: hidden;
@@ -748,51 +748,82 @@
 
 <!-- VIDEO RECORD -->
 <div class="screen" id="video-record">
-  <div class="screen-header">
-    <div class="screen-logo">Calling the Shots</div>
-    <button class="back-btn" onclick="stopRecording(); showScreen('video-prompts')">← Back</button>
-  </div>
-  <div class="screen-body">
-    <div class="active-prompt" id="active-prompt-text">"Share a favorite memory with the couple"</div>
-    <div class="video-preview">
-      <video id="record-video" autoplay muted playsinline></video>
-      <div class="record-overlay">
+  <!-- Full screen camera -->
+  <video id="record-video" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);z-index:0;"></video>
+
+  <!-- Overlay UI -->
+  <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;">
+
+    <!-- Top bar -->
+    <div class="screen-header" style="background:linear-gradient(180deg,rgba(0,0,0,0.75),transparent);border:none;">
+      <div class="screen-logo">Calling the Shots</div>
+      <button class="back-btn" onclick="stopRecording(); stopCamera(); showScreen('video-prompts')">← Back</button>
+    </div>
+
+    <!-- Center prompt -->
+    <div style="text-align:center;padding:0 5vw;">
+      <div class="active-prompt" id="active-prompt-text" style="background:rgba(0,0,0,0.45);padding:16px 24px;border-left:3px solid var(--gold);backdrop-filter:blur(4px);">"Share a favorite memory with the couple"</div>
+    </div>
+
+    <!-- Bottom bar — timer + buttons -->
+    <div style="background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 32px 32px;display:flex;flex-direction:column;gap:16px;align-items:center;">
+      <!-- Timer bar -->
+      <div style="width:100%;max-width:700px;">
         <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
-        <div class="timer-text"><span class="rec-dot" id="rec-dot" style="display:none"></span><span id="timer-display">00:30</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;">
+          <div class="timer-text"><span class="rec-dot" id="rec-dot" style="display:none"></span><span id="timer-display">00:30</span></div>
+          <div class="timer-text" style="color:rgba(255,255,255,0.4);">MAX 30 SEC</div>
+        </div>
+      </div>
+      <!-- Buttons -->
+      <div class="row">
+        <button class="gold-btn" id="record-btn" onclick="toggleRecording()">Start Recording</button>
+        <button class="outline-btn" id="submit-video-btn" onclick="submitVideo()" style="display:none">Submit Message</button>
       </div>
     </div>
-    <div class="row">
-      <button class="gold-btn" id="record-btn" onclick="toggleRecording()">Start Recording</button>
-      <button class="outline-btn" id="submit-video-btn" onclick="submitVideo()" style="display:none">Submit Message</button>
-    </div>
+
   </div>
 </div>
 
 <!-- PHOTO BOOTH -->
 <div class="screen" id="photo-booth">
-  <div class="screen-header">
-    <div class="screen-logo">Calling the Shots</div>
-    <button class="back-btn" onclick="stopCamera(); showScreen('welcome')">← Back</button>
-  </div>
-  <div class="screen-body">
-    <div class="screen-title" id="photo-screen-title">Get Ready!</div>
-    <div class="photo-dots">
-      <div class="dot" id="dot-1"></div>
-      <div class="dot" id="dot-2"></div>
-      <div class="dot" id="dot-3"></div>
-      <div class="dot" id="dot-4"></div>
+  <!-- Full screen camera -->
+  <video id="photo-video" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);z-index:0;"></video>
+  <canvas id="photo-canvas" style="display:none"></canvas>
+
+  <!-- Overlay UI on top of camera -->
+  <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;padding:0;">
+
+    <!-- Top bar -->
+    <div class="screen-header" style="background:linear-gradient(180deg,rgba(0,0,0,0.7),transparent);border:none;">
+      <div class="screen-logo">Calling the Shots</div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <div class="photo-dots" style="margin:0;">
+          <div class="dot" id="dot-1"></div>
+          <div class="dot" id="dot-2"></div>
+          <div class="dot" id="dot-3"></div>
+          <div class="dot" id="dot-4"></div>
+        </div>
+        <button class="back-btn" onclick="stopCamera(); showScreen('welcome')">← Back</button>
+      </div>
     </div>
-    <div class="photo-preview">
-      <video id="photo-video" autoplay muted playsinline></video>
-      <canvas id="photo-canvas" style="display:none"></canvas>
+
+    <!-- Center title -->
+    <div style="text-align:center;">
+      <div class="screen-title" id="photo-screen-title" style="text-shadow:0 2px 12px rgba(0,0,0,0.8);">Get Ready!</div>
     </div>
-    <div class="photo-strip" id="photo-strip">
-      <div class="strip-photo" id="ph1"><div class="strip-number">1</div></div>
-      <div class="strip-photo" id="ph2"><div class="strip-number">2</div></div>
-      <div class="strip-photo" id="ph3"><div class="strip-number">3</div></div>
-      <div class="strip-photo" id="ph4"><div class="strip-number">4</div></div>
+
+    <!-- Bottom bar — strip + button -->
+    <div style="background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 24px 28px;display:flex;align-items:center;gap:20px;">
+      <div class="photo-strip" id="photo-strip" style="flex:1;max-width:none;">
+        <div class="strip-photo" id="ph1"><div class="strip-number">1</div></div>
+        <div class="strip-photo" id="ph2"><div class="strip-number">2</div></div>
+        <div class="strip-photo" id="ph3"><div class="strip-number">3</div></div>
+        <div class="strip-photo" id="ph4"><div class="strip-number">4</div></div>
+      </div>
+      <button class="gold-btn" id="photo-action-btn" onclick="runPhotoSession()" style="white-space:nowrap;flex-shrink:0;">Take Photos</button>
     </div>
-    <button class="gold-btn" id="photo-action-btn" onclick="runPhotoSession()">Take Photos</button>
+
   </div>
 </div>
 
