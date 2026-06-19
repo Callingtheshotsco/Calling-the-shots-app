@@ -697,7 +697,7 @@
     <div class="logo-script" id="secret-logo-tap" onclick="handleLogoTap()" style="cursor:pointer;">Calling the Shots</div>
     <div class="since-row">
       <div class="since-line"></div>
-      <div class="since-text">Since 2026</div>
+      <div class="since-text" id="welcome-subtext">Since 2026</div>
       <div class="since-line r"></div>
     </div>
   </div>
@@ -1120,8 +1120,15 @@
 
   function applyWelcomeBranding() {
     const logoEl = document.getElementById('secret-logo-tap');
+    const subtextEl = document.getElementById('welcome-subtext');
     if (!logoEl) return;
-    logoEl.textContent = eventSettings.showNamesOnWelcome ? eventSettings.coupleNames : 'Calling the Shots';
+    if (eventSettings.showNamesOnWelcome) {
+      logoEl.textContent = eventSettings.coupleNames;
+      if (subtextEl) subtextEl.textContent = eventSettings.eventDate;
+    } else {
+      logoEl.textContent = 'Calling the Shots';
+      if (subtextEl) subtextEl.textContent = 'Since 2026';
+    }
   }
 
   function applyPromptsToVideoScreen() {
