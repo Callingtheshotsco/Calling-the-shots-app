@@ -694,7 +694,7 @@
   <div class="particle p5"></div>
 
   <div class="welcome-content">
-    <div class="logo-script">Calling the Shots</div>
+    <div class="logo-script" id="secret-logo-tap" onclick="handleLogoTap()" style="cursor:pointer;">Calling the Shots</div>
     <div class="since-row">
       <div class="since-line"></div>
       <div class="since-text">Since 2026</div>
@@ -728,7 +728,7 @@
     <div class="screen-title">Choose Your Prompt</div>
     <div class="screen-sub">What would you like to talk about?</div>
     <div class="gold-divider"></div>
-    <div class="prompt-grid">
+    <div class="prompt-grid" id="prompt-grid">
       <div class="prompt-btn" onclick="selectPrompt(0, this)">
         <div class="prompt-number">01</div>
         <div class="prompt-text">Share a favorite memory with the couple</div>
@@ -851,7 +851,8 @@
       <div class="review-photo" id="rev3" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
       <div class="review-photo" id="rev4" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
       <div style="text-align:center;padding-top:4px;">
-        <div style="font-family:'Great Vibes',cursive;font-size:20px;color:#C9A84C;">Calling the Shots</div>
+        <div id="strip-couple-names" style="font-family:'Great Vibes',cursive;font-size:22px;color:#C9A84C;line-height:1.2;">The Smiths</div>
+        <div id="strip-event-date" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-top:2px;">June 20, 2026</div>
       </div>
     </div>
 
@@ -896,6 +897,162 @@
   </div>
 </div>
 
+<!-- ADMIN PIN LOCK -->
+<div class="screen" id="admin-pin-screen">
+  <div class="screen-header">
+    <div class="screen-logo">Admin Access</div>
+    <button class="back-btn" onclick="showScreen('welcome')">✕ Close</button>
+  </div>
+  <div class="screen-body">
+    <div class="screen-title">Enter PIN</div>
+    <div class="screen-sub">Staff access only</div>
+    <div class="gold-divider"></div>
+    <div class="phone-input-wrap">
+      <input class="phone-input" type="tel" id="admin-pin-input" placeholder="••••" maxlength="4" inputmode="numeric" style="letter-spacing:18px;">
+      <div id="admin-pin-error" style="color:#ff6b6b;font-family:'Jost',sans-serif;font-size:13px;opacity:0;transition:opacity 0.3s ease;">Incorrect PIN, try again</div>
+      <button class="gold-btn" onclick="checkAdminPin()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="screen" id="admin-panel">
+  <div class="screen-header">
+    <div class="screen-logo">Event Settings</div>
+    <button class="back-btn" onclick="closeAdmin()">✕ Close</button>
+  </div>
+  <div class="screen-body" style="gap:0;padding-top:90px;align-items:stretch;justify-content:flex-start;overflow-y:auto;height:100%;">
+    <div style="width:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:32px;padding-bottom:60px;">
+
+      <div class="screen-title" style="font-size:clamp(18px,2.5vw,26px);text-align:left;">Admin · Calling the Shots</div>
+
+      <!-- SECTION: Couple / Date -->
+      <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
+        <div class="admin-section-label">Couple &amp; Event Details</div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label class="admin-label">Couple / Honoree Names</label>
+          <input id="admin-couple-names" type="text" placeholder="e.g. Maria &amp; James" class="admin-input">
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label class="admin-label">Event Date</label>
+          <input id="admin-event-date" type="text" placeholder="e.g. June 20, 2026" class="admin-input">
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;padding-top:4px;">
+          <input type="checkbox" id="admin-show-names-welcome" style="width:20px;height:20px;accent-color:#C9A84C;">
+          <label for="admin-show-names-welcome" class="admin-label" style="text-transform:none;letter-spacing:0;font-size:14px;">Show couple names on the welcome screen instead of "Calling the Shots"</label>
+        </div>
+
+        <div style="text-align:center;padding-top:10px;">
+          <div class="admin-label" style="margin-bottom:10px;">Strip Footer Preview</div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center;gap:2px;background:#fff;padding:12px 24px;">
+            <div id="admin-preview-names" style="font-family:'Great Vibes',cursive;font-size:20px;color:#C9A84C;">The Smiths</div>
+            <div id="admin-preview-date" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:#999;text-transform:uppercase;">June 20, 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Video Prompts -->
+      <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
+        <div class="admin-section-label">Video Message Prompts</div>
+        <div class="admin-label" style="text-transform:none;letter-spacing:0;font-size:13px;opacity:0.6;">Edit any prompt, or tap a suggestion below a field to use it.</div>
+
+        <div id="admin-prompts-list" style="display:flex;flex-direction:column;gap:18px;"></div>
+
+        <button class="outline-btn" onclick="resetPromptsToDefault()" style="align-self:flex-start;">Reset to Defaults</button>
+      </div>
+
+      <!-- SECTION: Message Stats -->
+      <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
+        <div class="admin-section-label">Today's Activity</div>
+        <div style="display:flex;gap:16px;">
+          <div class="admin-stat-box">
+            <div class="admin-stat-num" id="stat-videos">0</div>
+            <div class="admin-stat-label">Video Messages</div>
+          </div>
+          <div class="admin-stat-box">
+            <div class="admin-stat-num" id="stat-photos">0</div>
+            <div class="admin-stat-label">Photo Sessions</div>
+          </div>
+        </div>
+        <button class="outline-btn" onclick="resetStats()" style="align-self:flex-start;margin-top:4px;">Reset Counts</button>
+      </div>
+
+      <!-- SAVE -->
+      <div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:24px;display:flex;flex-direction:column;gap:12px;align-items:center;">
+        <button class="gold-btn" onclick="saveEventSettings()" style="width:100%;">Save Event Settings</button>
+        <div id="admin-saved-msg" style="text-align:center;font-family:'Jost',sans-serif;font-size:13px;color:var(--gold);opacity:0;transition:opacity 0.3s ease;">✓ Saved!</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .admin-section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .admin-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+  .admin-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 14px 16px;
+    color: #fff;
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+    outline: none;
+    width: 100%;
+  }
+  .admin-input:focus { border-color: var(--gold); }
+  .admin-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .admin-suggestion-chip {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    color: rgba(201,168,76,0.8);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .admin-suggestion-chip:active { background: rgba(201,168,76,0.15); border-color: var(--gold); }
+  .admin-stat-box {
+    flex: 1;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.25);
+    padding: 18px;
+    text-align: center;
+  }
+  .admin-stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: 36px;
+    color: var(--gold);
+  }
+  .admin-stat-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+</style>
+
 <script>
   let selectedPromptIndex = 0;
   let mediaRecorder = null;
@@ -905,13 +1062,205 @@
   let isRecording = false;
   let photoStream = null;
   let capturedPhotos = [];
+  let logoTapCount = 0;
+  let logoTapTimer = null;
 
-  const prompts = [
+  // ===== EVENT SETTINGS (persisted per device via localStorage) =====
+  const ADMIN_PIN = "1234"; // Change this to your preferred PIN
+
+  const defaultPrompts = [
     "Share a favorite memory with the couple",
     "What's your best advice for their marriage?",
     "Share a wish for their future together",
     "Say whatever is in your heart right now"
   ];
+
+  const promptSuggestions = [
+    "How did you meet the couple?",
+    "What's your favorite thing about them as a pair?",
+    "Tell them a joke or a toast",
+    "What do you hope for their first year of marriage?",
+    "Describe them in three words and why",
+    "Share advice from your own relationship",
+    "What's a memory that always makes you laugh together?",
+    "Welcome them to the family / friend group",
+    "What does love mean to you?",
+    "Leave them a blessing for the road ahead"
+  ];
+
+  let eventSettings = {
+    coupleNames: "The Smiths",
+    eventDate: "June 20, 2026",
+    showNamesOnWelcome: false,
+    prompts: [...defaultPrompts]
+  };
+
+  let dailyStats = { videos: 0, photos: 0 };
+
+  function loadEventSettings() {
+    try {
+      const saved = localStorage.getItem('ctsEventSettings');
+      if (saved) eventSettings = { ...eventSettings, ...JSON.parse(saved) };
+    } catch(e) { console.log('No saved settings yet'); }
+    try {
+      const savedStats = localStorage.getItem('ctsDailyStats');
+      if (savedStats) dailyStats = JSON.parse(savedStats);
+    } catch(e) {}
+    applyEventSettingsToStrip();
+    applyWelcomeBranding();
+    applyPromptsToVideoScreen();
+  }
+
+  function applyEventSettingsToStrip() {
+    const namesEl = document.getElementById('strip-couple-names');
+    const dateEl = document.getElementById('strip-event-date');
+    if (namesEl) namesEl.textContent = eventSettings.coupleNames;
+    if (dateEl) dateEl.textContent = eventSettings.eventDate;
+  }
+
+  function applyWelcomeBranding() {
+    const logoEl = document.getElementById('secret-logo-tap');
+    if (!logoEl) return;
+    logoEl.textContent = eventSettings.showNamesOnWelcome ? eventSettings.coupleNames : 'Calling the Shots';
+  }
+
+  function applyPromptsToVideoScreen() {
+    // Rebuild the prompt grid on the video-prompts screen
+    const grid = document.getElementById('prompt-grid');
+    if (!grid) return;
+    grid.innerHTML = eventSettings.prompts.map((p, i) => `
+      <div class="prompt-btn" onclick="selectPrompt(${i}, this)">
+        <div class="prompt-number">0${i + 1}</div>
+        <div class="prompt-text">${escapeHtml(p)}</div>
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ===== PIN LOCK =====
+  function handleLogoTap() {
+    logoTapCount++;
+    clearTimeout(logoTapTimer);
+    logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
+    if (logoTapCount >= 5) {
+      logoTapCount = 0;
+      document.getElementById('admin-pin-input').value = '';
+      document.getElementById('admin-pin-error').style.opacity = '0';
+      showScreen('admin-pin-screen');
+    }
+  }
+
+  function checkAdminPin() {
+    const entered = document.getElementById('admin-pin-input').value;
+    if (entered === ADMIN_PIN) {
+      openAdmin();
+    } else {
+      document.getElementById('admin-pin-error').style.opacity = '1';
+      document.getElementById('admin-pin-input').value = '';
+    }
+  }
+
+  // ===== ADMIN PANEL =====
+  function openAdmin() {
+    document.getElementById('admin-couple-names').value = eventSettings.coupleNames;
+    document.getElementById('admin-event-date').value = eventSettings.eventDate;
+    document.getElementById('admin-show-names-welcome').checked = eventSettings.showNamesOnWelcome;
+    renderPromptEditors();
+    renderStats();
+    updateAdminPreview();
+    showScreen('admin-panel');
+  }
+
+  function closeAdmin() {
+    showScreen('welcome');
+  }
+
+  function updateAdminPreview() {
+    const names = document.getElementById('admin-couple-names').value || 'The Smiths';
+    const date = document.getElementById('admin-event-date').value || 'June 20, 2026';
+    document.getElementById('admin-preview-names').textContent = names;
+    document.getElementById('admin-preview-date').textContent = date;
+  }
+
+  function renderPromptEditors() {
+    const list = document.getElementById('admin-prompts-list');
+    list.innerHTML = eventSettings.prompts.map((p, i) => `
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label class="admin-label">Prompt ${i + 1}</label>
+        <input type="text" class="admin-input admin-prompt-input" data-index="${i}" value="${escapeHtml(p)}">
+        <div class="admin-suggestions">
+          ${promptSuggestions.slice(0, 5).map(s => `<div class="admin-suggestion-chip" onclick="applySuggestion(${i}, this)" data-text="${escapeHtml(s)}">${escapeHtml(s)}</div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function applySuggestion(index, el) {
+    const text = el.getAttribute('data-text');
+    const input = document.querySelector(`.admin-prompt-input[data-index="${index}"]`);
+    if (input) input.value = text;
+  }
+
+  function resetPromptsToDefault() {
+    eventSettings.prompts = [...defaultPrompts];
+    renderPromptEditors();
+  }
+
+  function renderStats() {
+    document.getElementById('stat-videos').textContent = dailyStats.videos;
+    document.getElementById('stat-photos').textContent = dailyStats.photos;
+  }
+
+  function resetStats() {
+    dailyStats = { videos: 0, photos: 0 };
+    try { localStorage.setItem('ctsDailyStats', JSON.stringify(dailyStats)); } catch(e) {}
+    renderStats();
+  }
+
+  function incrementStat(key) {
+    dailyStats[key] = (dailyStats[key] || 0) + 1;
+    try { localStorage.setItem('ctsDailyStats', JSON.stringify(dailyStats)); } catch(e) {}
+  }
+
+  function saveEventSettings() {
+    eventSettings.coupleNames = document.getElementById('admin-couple-names').value || 'The Smiths';
+    eventSettings.eventDate = document.getElementById('admin-event-date').value || 'June 20, 2026';
+    eventSettings.showNamesOnWelcome = document.getElementById('admin-show-names-welcome').checked;
+
+    const promptInputs = document.querySelectorAll('.admin-prompt-input');
+    const newPrompts = [...eventSettings.prompts];
+    promptInputs.forEach(input => {
+      const idx = parseInt(input.getAttribute('data-index'));
+      newPrompts[idx] = input.value || defaultPrompts[idx];
+    });
+    eventSettings.prompts = newPrompts;
+
+    try { localStorage.setItem('ctsEventSettings', JSON.stringify(eventSettings)); } catch(e) {}
+
+    applyEventSettingsToStrip();
+    applyWelcomeBranding();
+    applyPromptsToVideoScreen();
+    updateAdminPreview();
+
+    const msg = document.getElementById('admin-saved-msg');
+    msg.style.opacity = '1';
+    setTimeout(() => { msg.style.opacity = '0'; }, 2000);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadEventSettings();
+    const namesInput = document.getElementById('admin-couple-names');
+    const dateInput = document.getElementById('admin-event-date');
+    if (namesInput) namesInput.addEventListener('input', updateAdminPreview);
+    if (dateInput) dateInput.addEventListener('input', updateAdminPreview);
+    const pinInput = document.getElementById('admin-pin-input');
+    if (pinInput) pinInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') checkAdminPin(); });
+  });
 
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -922,7 +1271,7 @@
 
   function selectPrompt(index, el) {
     selectedPromptIndex = index;
-    document.getElementById('active-prompt-text').textContent = `"${prompts[index]}"`;
+    document.getElementById('active-prompt-text').textContent = `"${eventSettings.prompts[index]}"`;
     showScreen('video-record');
   }
 
@@ -1002,6 +1351,7 @@
   function submitVideo() {
     const blob = new Blob(recordedChunks, { type: 'video/webm' });
     console.log('Video saved:', blob.size, 'bytes');
+    incrementStat('videos');
     stopCamera();
     showThankyou('video');
   }
@@ -1047,6 +1397,7 @@
       el.style.backgroundPosition = 'center';
       el.style.transform = 'scaleX(-1)';
     }
+    applyEventSettingsToStrip();
   }
 
   async function retakePhotos() {
@@ -1103,10 +1454,14 @@
 
   function sendPhotos() {
     console.log('Sending photos to:', document.getElementById('phone-input').value);
+    incrementStat('photos');
     showThankyou('photo');
   }
 
-  function skipPhone() { showThankyou('photo'); }
+  function skipPhone() {
+    incrementStat('photos');
+    showThankyou('photo');
+  }
 
   function showThankyou(type) {
     if (type === 'video') {
