@@ -427,15 +427,21 @@
 
   .active-prompt {
     font-family: 'Jost', sans-serif;
-    font-size: clamp(16px, 2.2vw, 24px);
-    color: rgba(255,255,255,0.7);
+    font-size: clamp(18px, 2.6vw, 28px);
+    color: var(--white);
     text-align: center;
     font-style: italic;
-    font-weight: 300;
-    max-width: 700px;
+    font-weight: 400;
+    max-width: 720px;
     line-height: 1.6;
-    border-left: 3px solid var(--gold);
-    padding-left: 20px;
+    background: rgba(10,10,10,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 4px;
+    padding: 28px 36px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    box-shadow: 0 0 30px rgba(201,168,76,0.15), inset 0 0 30px rgba(201,168,76,0.05);
   }
 
   /* ===================== */
@@ -740,9 +746,6 @@
         <div class="prompt-text">Say whatever is in your heart right now</div>
       </div>
     </div>
-    <button class="gold-btn" id="start-record-btn" onclick="showScreen('video-record')" style="opacity:0.3;pointer-events:none;">
-      Start Recording
-    </button>
   </div>
 </div>
 
@@ -752,21 +755,21 @@
   <video id="record-video" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);z-index:0;"></video>
 
   <!-- Overlay UI -->
-  <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;">
+  <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;">
 
     <!-- Top bar -->
-    <div class="screen-header" style="background:linear-gradient(180deg,rgba(0,0,0,0.75),transparent);border:none;">
+    <div class="screen-header" style="background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);border:none;position:relative;flex-shrink:0;">
       <div class="screen-logo">Calling the Shots</div>
       <button class="back-btn" onclick="stopRecording(); stopCamera(); showScreen('video-prompts')">← Back</button>
     </div>
 
-    <!-- Center prompt -->
-    <div style="text-align:center;padding:0 5vw;">
-      <div class="active-prompt" id="active-prompt-text" style="background:rgba(0,0,0,0.45);padding:16px 24px;border-left:3px solid var(--gold);backdrop-filter:blur(4px);">"Share a favorite memory with the couple"</div>
+    <!-- Prompt — pushed below header, never overlaps -->
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 5vw;">
+      <div class="active-prompt" id="active-prompt-text">"Share a favorite memory with the couple"</div>
     </div>
 
     <!-- Bottom bar — timer + buttons -->
-    <div style="background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 32px 32px;display:flex;flex-direction:column;gap:16px;align-items:center;">
+    <div style="background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 32px 32px;display:flex;flex-direction:column;gap:16px;align-items:center;flex-shrink:0;">
       <!-- Timer bar -->
       <div style="width:100%;max-width:700px;">
         <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
@@ -824,6 +827,35 @@
       <button class="gold-btn" id="photo-action-btn" onclick="runPhotoSession()" style="white-space:nowrap;flex-shrink:0;">Take Photos</button>
     </div>
 
+  </div>
+</div>
+
+<!-- PHOTO REVIEW -->
+<div class="screen" id="photo-review">
+  <div class="screen-header">
+    <div class="screen-logo">Calling the Shots</div>
+    <button class="back-btn" onclick="retakePhotos()">↺ Retake</button>
+  </div>
+  <div class="screen-body">
+    <div class="screen-title">Here's Your Strip!</div>
+    <div class="screen-sub">Love it? Let's get it printed and sent to you.</div>
+    <div class="gold-divider"></div>
+
+    <!-- Vertical strip preview, like the real printed strip -->
+    <div id="review-strip" style="display:flex;flex-direction:column;gap:8px;background:#fff;padding:14px;width:min(34vw,260px);box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+      <div class="review-photo" id="rev1" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
+      <div class="review-photo" id="rev2" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
+      <div class="review-photo" id="rev3" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
+      <div class="review-photo" id="rev4" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
+      <div style="text-align:center;padding-top:4px;">
+        <div style="font-family:'Great Vibes',cursive;font-size:20px;color:#C9A84C;">Calling the Shots</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="outline-btn" onclick="retakePhotos()">Retake Photos</button>
+      <button class="gold-btn" onclick="showScreen('phone-screen')">Looks Great!</button>
+    </div>
   </div>
 </div>
 
@@ -886,13 +918,9 @@
   }
 
   function selectPrompt(index, el) {
-    document.querySelectorAll('.prompt-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
     selectedPromptIndex = index;
     document.getElementById('active-prompt-text').textContent = `"${prompts[index]}"`;
-    const btn = document.getElementById('start-record-btn');
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = 'all';
+    showScreen('video-record');
   }
 
   async function startCamera(videoId) {
@@ -915,8 +943,14 @@
   }
 
   async function toggleRecording() {
-    if (!isRecording) await startVideoRecording();
-    else stopRecording();
+    if (!isRecording) {
+      document.getElementById('record-btn').style.pointerEvents = 'none';
+      await countdown(3);
+      document.getElementById('record-btn').style.pointerEvents = 'all';
+      await startVideoRecording();
+    } else {
+      stopRecording();
+    }
   }
 
   async function startVideoRecording() {
@@ -957,11 +991,9 @@
   }
 
   function resetVideoUI() {
-    document.getElementById('start-record-btn').style.opacity = '0.3';
-    document.getElementById('start-record-btn').style.pointerEvents = 'none';
     document.getElementById('submit-video-btn').style.display = 'none';
     document.getElementById('record-btn').textContent = 'Start Recording';
-    document.querySelectorAll('.prompt-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('record-btn').style.display = 'block';
   }
 
   function submitVideo() {
@@ -1000,7 +1032,24 @@
     document.getElementById('photo-screen-title').textContent = 'Looking good! 🎉';
     stopCamera();
     await sleep(1000);
-    showScreen('phone-screen');
+    populateReviewStrip();
+    showScreen('photo-review');
+  }
+
+  function populateReviewStrip() {
+    for (let i = 0; i < 4; i++) {
+      const el = document.getElementById('rev' + (i + 1));
+      el.style.backgroundImage = `url(${capturedPhotos[i]})`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+      el.style.transform = 'scaleX(-1)';
+    }
+  }
+
+  async function retakePhotos() {
+    showScreen('photo-booth');
+    resetPhotoUI();
+    await startCamera('photo-video');
   }
 
   function capturePhoto(index) {
