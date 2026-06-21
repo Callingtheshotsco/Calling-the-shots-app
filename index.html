@@ -1063,6 +1063,8 @@
   let photoStream = null;
   let capturedPhotos = [];
   let logoTapCount = 0;
+  // Make.com webhook — receives photos/videos and saves to Google Drive
+  const WEBHOOK_URL = "https://hook.us2.make.com/x7ac5tg7gfswb4wqjmuw7t5nmt31hgty";
   let logoTapTimer = null;
 
   // ===== EVENT SETTINGS (persisted per device via localStorage) =====
@@ -1355,12 +1357,44 @@
     document.getElementById('record-btn').style.display = 'block';
   }
 
-  function submitVideo() {
+  async function submitVideo() {
     const blob = new Blob(recordedChunks, { type: 'video/webm' });
-    console.log('Video saved:', blob.size, 'bytes');
     incrementStat('videos');
     stopCamera();
+
+    // Show thank you immediately so guest isn't kept waiting
     showThankyou('video');
+
+    // Upload in the background
+    try {
+      const base64 = await blobToBase64(blob);
+      const fileName = `video-${eventSettings.coupleNames.replace(/[^a-z0-9]/gi, '-')}-${Date.now()}.webm`;
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'video',
+          fileName: fileName,
+          data: base64,
+          prompt: prompts ? prompts[selectedPromptIndex] : eventSettings.prompts[selectedPromptIndex],
+          coupleNames: eventSettings.coupleNames,
+          eventDate: eventSettings.eventDate,
+          timestamp: new Date().toISOString()
+        })
+      });
+      console.log('Video uploaded successfully');
+    } catch (err) {
+      console.error('Video upload failed:', err);
+    }
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   }
 
   async function startPhotoSession() {
@@ -1459,15 +1493,45 @@
     input.value = val;
   }
 
-  function sendPhotos() {
-    console.log('Sending photos to:', document.getElementById('phone-input').value);
+  async function sendPhotos() {
+    const phone = document.getElementById('phone-input').value;
     incrementStat('photos');
     showThankyou('photo');
+    await uploadPhotos(phone);
   }
 
-  function skipPhone() {
+  async function skipPhone() {
     incrementStat('photos');
     showThankyou('photo');
+    await uploadPhotos(null);
+  }
+
+  async function uploadPhotos(phone) {
+    try {
+      const safeNames = eventSettings.coupleNames.replace(/[^a-z0-9]/gi, '-');
+      const batchId = Date.now();
+      for (let i = 0; i < capturedPhotos.length; i++) {
+        const base64 = capturedPhotos[i].split(',')[1];
+        const fileName = `photo-${safeNames}-${batchId}-${i + 1}.jpg`;
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'photo',
+            fileName: fileName,
+            data: base64,
+            photoIndex: i + 1,
+            phone: phone || 'not provided',
+            coupleNames: eventSettings.coupleNames,
+            eventDate: eventSettings.eventDate,
+            timestamp: new Date().toISOString()
+          })
+        });
+      }
+      console.log('Photos uploaded successfully');
+    } catch (err) {
+      console.error('Photo upload failed:', err);
+    }
   }
 
   function showThankyou(type) {
