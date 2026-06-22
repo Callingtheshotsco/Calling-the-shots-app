@@ -751,29 +751,21 @@
 
 <!-- VIDEO RECORD -->
 <div class="screen" id="video-record">
-  <!-- Full screen camera -->
   <video id="record-video" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);z-index:0;"></video>
 
-  <!-- Overlay UI -->
   <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;">
-
-    <!-- Top bar -->
     <div class="screen-header" style="background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);border:none;position:relative;flex-shrink:0;">
       <div class="screen-logo">Calling the Shots</div>
       <button class="back-btn" onclick="stopRecording(); stopCamera(); showScreen('video-prompts')">← Back</button>
     </div>
 
-    <!-- Prompt — sits just below header, leaves rest of camera open -->
     <div style="flex-shrink:0;display:flex;justify-content:center;padding:18px 5vw 0;">
       <div class="active-prompt" id="active-prompt-text">"Share a favorite memory with the couple"</div>
     </div>
 
-    <!-- Spacer pushes bottom bar down, keeps camera visible -->
     <div style="flex:1;"></div>
 
-    <!-- Bottom bar — timer + buttons -->
     <div style="background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 32px 32px;display:flex;flex-direction:column;gap:16px;align-items:center;flex-shrink:0;">
-      <!-- Timer bar -->
       <div style="width:100%;max-width:700px;">
         <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
         <div style="display:flex;justify-content:space-between;margin-top:6px;">
@@ -781,26 +773,20 @@
           <div class="timer-text" style="color:rgba(255,255,255,0.4);">MAX 30 SEC</div>
         </div>
       </div>
-      <!-- Buttons -->
       <div class="row">
         <button class="gold-btn" id="record-btn" onclick="toggleRecording()">Start Recording</button>
         <button class="outline-btn" id="submit-video-btn" onclick="submitVideo()" style="display:none">Submit Message</button>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- PHOTO BOOTH -->
 <div class="screen" id="photo-booth">
-  <!-- Full screen camera -->
   <video id="photo-video" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);z-index:0;"></video>
   <canvas id="photo-canvas" style="display:none"></canvas>
 
-  <!-- Overlay UI on top of camera -->
   <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;padding:0;">
-
-    <!-- Top bar -->
     <div class="screen-header" style="background:linear-gradient(180deg,rgba(0,0,0,0.7),transparent);border:none;">
       <div class="screen-logo">Calling the Shots</div>
       <div style="display:flex;align-items:center;gap:20px;">
@@ -814,12 +800,10 @@
       </div>
     </div>
 
-    <!-- Center title -->
     <div style="text-align:center;">
       <div class="screen-title" id="photo-screen-title" style="text-shadow:0 2px 12px rgba(0,0,0,0.8);">Get Ready!</div>
     </div>
 
-    <!-- Bottom bar — strip + button -->
     <div style="background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 24px 28px;display:flex;align-items:center;gap:20px;">
       <div class="photo-strip" id="photo-strip" style="flex:1;max-width:none;">
         <div class="strip-photo" id="ph1"><div class="strip-number">1</div></div>
@@ -829,7 +813,6 @@
       </div>
       <button class="gold-btn" id="photo-action-btn" onclick="runPhotoSession()" style="white-space:nowrap;flex-shrink:0;">Take Photos</button>
     </div>
-
   </div>
 </div>
 
@@ -844,7 +827,6 @@
     <div class="screen-sub">Love it? Let's get it printed and sent to you.</div>
     <div class="gold-divider"></div>
 
-    <!-- Vertical strip preview, like the real printed strip -->
     <div id="review-strip" style="display:flex;flex-direction:column;gap:8px;background:#fff;padding:14px;width:min(34vw,260px);box-shadow:0 10px 40px rgba(0,0,0,0.5);">
       <div class="review-photo" id="rev1" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
       <div class="review-photo" id="rev2" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
@@ -926,7 +908,6 @@
 
       <div class="screen-title" style="font-size:clamp(18px,2.5vw,26px);text-align:left;">Admin · Calling the Shots</div>
 
-      <!-- SECTION: Couple / Date -->
       <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
         <div class="admin-section-label">Couple &amp; Event Details</div>
 
@@ -954,17 +935,13 @@
         </div>
       </div>
 
-      <!-- SECTION: Video Prompts -->
       <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
         <div class="admin-section-label">Video Message Prompts</div>
         <div class="admin-label" style="text-transform:none;letter-spacing:0;font-size:13px;opacity:0.6;">Edit any prompt, or tap a suggestion below a field to use it.</div>
-
         <div id="admin-prompts-list" style="display:flex;flex-direction:column;gap:18px;"></div>
-
         <button class="outline-btn" onclick="resetPromptsToDefault()" style="align-self:flex-start;">Reset to Defaults</button>
       </div>
 
-      <!-- SECTION: Message Stats -->
       <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
         <div class="admin-section-label">Today's Activity</div>
         <div style="display:flex;gap:16px;">
@@ -980,7 +957,6 @@
         <button class="outline-btn" onclick="resetStats()" style="align-self:flex-start;margin-top:4px;">Reset Counts</button>
       </div>
 
-      <!-- SAVE -->
       <div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:24px;display:flex;flex-direction:column;gap:12px;align-items:center;">
         <button class="gold-btn" onclick="saveEventSettings()" style="width:100%;">Save Event Settings</button>
         <div id="admin-saved-msg" style="text-align:center;font-family:'Jost',sans-serif;font-size:13px;color:var(--gold);opacity:0;transition:opacity 0.3s ease;">✓ Saved!</div>
@@ -1063,12 +1039,13 @@
   let photoStream = null;
   let capturedPhotos = [];
   let logoTapCount = 0;
-  // Make.com webhook — receives photos/videos and saves to Google Drive
-  const WEBHOOK_URL = "https://hook.us2.make.com/x7ac5tg7gfswb4wqjmuw7t5nmt31hgty";
+
+  // *** UPDATED: Google Apps Script webhook replaces Make.com ***
+  const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx6ARMCh-AG72Fuv7H4aiwMbh7koNkypA0P2Y1OhucyhxRx_0nByOxxVqIwI9TpZtpc/exec";
+
   let logoTapTimer = null;
 
-  // ===== EVENT SETTINGS (persisted per device via localStorage) =====
-  const ADMIN_PIN = "1234"; // Change this to your preferred PIN
+  const ADMIN_PIN = "1234";
 
   const defaultPrompts = [
     "Share a favorite memory with the couple",
@@ -1103,7 +1080,7 @@
     try {
       const saved = localStorage.getItem('ctsEventSettings');
       if (saved) eventSettings = { ...eventSettings, ...JSON.parse(saved) };
-    } catch(e) { console.log('No saved settings yet'); }
+    } catch(e) {}
     try {
       const savedStats = localStorage.getItem('ctsDailyStats');
       if (savedStats) dailyStats = JSON.parse(savedStats);
@@ -1134,7 +1111,6 @@
   }
 
   function applyPromptsToVideoScreen() {
-    // Rebuild the prompt grid on the video-prompts screen
     const grid = document.getElementById('prompt-grid');
     if (!grid) return;
     grid.innerHTML = eventSettings.prompts.map((p, i) => `
@@ -1151,7 +1127,6 @@
     return div.innerHTML;
   }
 
-  // ===== PIN LOCK =====
   function handleLogoTap() {
     logoTapCount++;
     clearTimeout(logoTapTimer);
@@ -1174,7 +1149,6 @@
     }
   }
 
-  // ===== ADMIN PANEL =====
   function openAdmin() {
     document.getElementById('admin-couple-names').value = eventSettings.coupleNames;
     document.getElementById('admin-event-date').value = eventSettings.eventDate;
@@ -1185,9 +1159,7 @@
     showScreen('admin-panel');
   }
 
-  function closeAdmin() {
-    showScreen('welcome');
-  }
+  function closeAdmin() { showScreen('welcome'); }
 
   function updateAdminPreview() {
     const names = document.getElementById('admin-couple-names').value || 'The Smiths';
@@ -1361,11 +1333,8 @@
     const blob = new Blob(recordedChunks, { type: 'video/webm' });
     incrementStat('videos');
     stopCamera();
-
-    // Show thank you immediately so guest isn't kept waiting
     showThankyou('video');
 
-    // Upload in the background
     try {
       const base64 = await blobToBase64(blob);
       const fileName = `video-${eventSettings.coupleNames.replace(/[^a-z0-9]/gi, '-')}-${Date.now()}.webm`;
@@ -1376,13 +1345,12 @@
           type: 'video',
           fileName: fileName,
           data: base64,
-          prompt: prompts ? prompts[selectedPromptIndex] : eventSettings.prompts[selectedPromptIndex],
+          prompt: eventSettings.prompts[selectedPromptIndex],
           coupleNames: eventSettings.coupleNames,
           eventDate: eventSettings.eventDate,
           timestamp: new Date().toISOString()
         })
       });
-      console.log('Video uploaded successfully');
     } catch (err) {
       console.error('Video upload failed:', err);
     }
@@ -1528,7 +1496,6 @@
           })
         });
       }
-      console.log('Photos uploaded successfully');
     } catch (err) {
       console.error('Photo upload failed:', err);
     }
