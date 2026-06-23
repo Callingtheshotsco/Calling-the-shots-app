@@ -1533,7 +1533,8 @@
         await sleep(800);
       }
 
-      // Upload composite strip
+      // Wait for all photo uploads to settle, then upload composite strip
+      await sleep(1000);
       const stripBase64 = await captureStrip();
       const stripFileName = `strip-${safeNames}-${batchId}.jpg`;
       fetch(WEBHOOK_URL, {
