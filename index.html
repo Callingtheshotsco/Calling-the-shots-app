@@ -825,14 +825,16 @@
     <div class="screen-sub">Love it? Let's get it printed and sent to you.</div>
     <div class="gold-divider"></div>
 
-    <div id="review-strip" style="display:flex;flex-direction:column;gap:8px;background:#fff;padding:14px;width:min(34vw,260px);box-shadow:0 10px 40px rgba(0,0,0,0.5);">
-      <div class="review-photo" id="rev1" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
-      <div class="review-photo" id="rev2" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
-      <div class="review-photo" id="rev3" style="aspect-ratio:4/3;overflow:hidden;background:#111;"></div>
-      <div style="text-align:center;padding-top:8px;padding-bottom:4px;background:#fff;">
-        <div id="strip-couple-names" style="font-family:'Great Vibes',cursive;font-size:22px;color:#C9A84C;line-height:1.4;">The Smiths</div>
-        <div id="strip-event-date" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-top:2px;">June 20, 2026</div>
-        <div style="font-family:'Great Vibes',cursive;font-size:13px;color:#C9A84C;margin-top:4px;opacity:0.7;">Calling the Shots</div>
+    <div id="review-strip" style="display:flex;flex-direction:column;gap:0;background:#fff;padding:10px;width:min(34vw,260px);box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+      <div class="review-photo" id="rev1" style="aspect-ratio:4/3;overflow:hidden;background:#111;margin-bottom:6px;"></div>
+      <div class="review-photo" id="rev2" style="aspect-ratio:4/3;overflow:hidden;background:#111;margin-bottom:6px;"></div>
+      <div class="review-photo" id="rev3" style="aspect-ratio:4/3;overflow:hidden;background:#111;margin-bottom:6px;"></div>
+      <div id="review-info-panel" style="text-align:center;background:#fff;min-height:40px;display:flex;align-items:center;justify-content:center;">
+        <img id="review-info-image" style="display:none;width:100%;object-fit:contain;">
+        <div id="review-info-placeholder" style="font-family:'Great Vibes',cursive;font-size:16px;color:#C9A84C;padding:8px 0;">
+          <div id="strip-couple-names">The Smiths</div>
+          <div id="strip-event-date" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-top:2px;">June 20, 2026</div>
+        </div>
       </div>
     </div>
 
@@ -1503,7 +1505,18 @@
       el.style.backgroundPosition = 'center';
       el.style.transform = 'scaleX(-1)';
     }
-    applyEventSettingsToStrip();
+    // Show uploaded info panel image or fallback to text placeholder
+    const reviewImg = document.getElementById('review-info-image');
+    const reviewPlaceholder = document.getElementById('review-info-placeholder');
+    if (eventSettings.stripImage && reviewImg) {
+      reviewImg.src = eventSettings.stripImage;
+      reviewImg.style.display = 'block';
+      if (reviewPlaceholder) reviewPlaceholder.style.display = 'none';
+    } else {
+      if (reviewImg) reviewImg.style.display = 'none';
+      if (reviewPlaceholder) reviewPlaceholder.style.display = 'block';
+      applyEventSettingsToStrip();
+    }
   }
 
   async function retakePhotos() {
