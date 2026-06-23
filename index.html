@@ -1465,14 +1465,14 @@
   async function sendPhotos() {
     const phone = document.getElementById('phone-input').value;
     incrementStat('photos');
-    showThankyou('photo');
     await uploadPhotos(phone);
+    showThankyou('photo');
   }
 
   async function skipPhone() {
     incrementStat('photos');
-    showThankyou('photo');
     await uploadPhotos(null);
+    showThankyou('photo');
   }
 
   async function captureStrip() {
@@ -1530,7 +1530,7 @@
             timestamp: new Date().toISOString()
           })
         });
-        await sleep(500);
+        await sleep(800);
       }
 
       // Upload composite strip
