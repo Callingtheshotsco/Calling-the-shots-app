@@ -957,51 +957,31 @@
 
       <!-- Strip Design Section -->
       <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
-        <div class="admin-section-label">Strip Design</div>
+        <div class="admin-section-label">Strip Info Panel</div>
+        <div class="admin-label" style="text-transform:none;letter-spacing:0;font-size:13px;opacity:0.6;">Fully customize every line of text on the bottom of the strip.</div>
 
+        <!-- Image upload -->
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="admin-label">Names Font</label>
-          <select id="admin-strip-font" class="admin-input" style="cursor:pointer;background:#1a1a1a;color:#fff;" onchange="updateStripPanelPreview()">
-            <option value="Georgia">Italic Serif (Classic)</option>
-            <option value="'Times New Roman', Times, serif">Times New Roman</option>
-            <option value="'Cinzel', serif">Cinzel (Elegant Caps)</option>
-            <option value="Arial, sans-serif">Arial (Clean Modern)</option>
-          </select>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="admin-label">Names Color</label>
-          <div style="display:flex;flex-wrap:wrap;gap:12px;padding:4px 0;">
-            <div class="color-chip selected-color" data-color="#C9A84C" style="background:#C9A84C;" onclick="selectColor(this)"><span>Gold</span></div>
-            <div class="color-chip" data-color="#000000" style="background:#000000;" onclick="selectColor(this)"><span>Black</span></div>
-            <div class="color-chip" data-color="#ffffff" style="background:#ffffff;border:1px solid #555;" onclick="selectColor(this)"><span style="color:#000">White</span></div>
-            <div class="color-chip" data-color="#c4857a" style="background:#c4857a;" onclick="selectColor(this)"><span>Blush</span></div>
-            <div class="color-chip" data-color="#1a2a4a" style="background:#1a2a4a;" onclick="selectColor(this)"><span>Navy</span></div>
-            <div class="color-chip" data-color="#4a7c59" style="background:#4a7c59;" onclick="selectColor(this)"><span>Sage</span></div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="admin-label">Strip Image (optional)</label>
-          <div style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Upload clipart, a monogram, or icon — it appears above the couple names on the strip.</div>
+          <label class="admin-label">Image (optional)</label>
+          <div style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Upload clipart, a logo, monogram, or any icon. Appears at the top of the info panel.</div>
           <input type="file" id="admin-strip-image" accept="image/*" onchange="loadStripImage(this)" style="color:#fff;font-family:'Jost',sans-serif;font-size:13px;">
-          <div id="strip-image-preview" style="display:none;margin-top:8px;display:flex;flex-direction:column;gap:8px;">
+          <div id="strip-image-preview" style="display:none;flex-direction:column;gap:8px;margin-top:8px;">
             <img id="strip-image-thumb" style="max-height:80px;max-width:200px;object-fit:contain;border:1px solid rgba(201,168,76,0.3);padding:4px;">
             <button onclick="clearStripImage()" class="outline-btn" style="align-self:flex-start;padding:8px 16px;font-size:11px;">Remove Image</button>
           </div>
         </div>
 
+        <!-- Text slots -->
+        <div id="strip-slots-editor" style="display:flex;flex-direction:column;gap:20px;"></div>
+
+        <!-- Live Preview -->
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="admin-label">Info Panel Preview</label>
-          <div id="strip-panel-preview" style="background:#fff;padding:16px 24px;text-align:center;max-width:260px;">
-            <div id="strip-preview-img-wrap" style="display:none;margin-bottom:8px;">
-              <img id="strip-preview-img" style="max-height:60px;max-width:140px;object-fit:contain;">
+          <label class="admin-label">Live Preview</label>
+          <div id="strip-panel-preview" style="background:#fff;padding:20px 24px;text-align:center;max-width:280px;min-height:80px;">
+            <div id="strip-preview-img-wrap" style="display:none;margin-bottom:10px;">
+              <img id="strip-preview-img" style="max-height:70px;max-width:160px;object-fit:contain;">
             </div>
-            <div style="width:60%;height:1px;background:#C9A84C;margin:0 auto 10px;opacity:0.7;"></div>
-            <div id="strip-preview-names" style="font-family:Georgia,serif;font-style:italic;font-size:22px;color:#C9A84C;">The Smiths</div>
-            <div id="strip-preview-date" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#999;text-transform:uppercase;margin-top:4px;">JUNE 20, 2026</div>
-            <div style="font-family:Georgia,serif;font-style:italic;font-size:11px;color:#C9A84C;opacity:0.5;margin-top:6px;">Calling the Shots</div>
-            <div style="width:40%;height:1px;background:#C9A84C;opacity:0.3;margin:8px auto 0;"></div>
+            <div id="strip-preview-slots"></div>
           </div>
         </div>
       </div>
@@ -1144,10 +1124,13 @@
     eventDate: "June 20, 2026",
     showNamesOnWelcome: false,
     prompts: [...defaultPrompts],
-    stripNameFont: 'Georgia',
-    stripTextColor: '#C9A84C',
-    stripDateColor: '#999999',
-    stripImage: null
+    stripImage: null,
+    stripSlots: [
+      { text: "The Smiths", font: "Georgia", color: "#C9A84C", size: 42, bold: false, italic: true, visible: true },
+      { text: "June 20, 2026", font: "Arial, sans-serif", color: "#999999", size: 14, bold: false, italic: false, visible: true },
+      { text: "Calling the Shots", font: "Georgia", color: "#C9A84C", size: 16, bold: false, italic: true, visible: true },
+      { text: "", font: "Arial, sans-serif", color: "#000000", size: 16, bold: false, italic: false, visible: false }
+    ]
   };
 
   let dailyStats = { videos: 0, photos: 0 };
@@ -1233,21 +1216,15 @@
     document.getElementById('admin-couple-names').value = eventSettings.coupleNames;
     document.getElementById('admin-event-date').value = eventSettings.eventDate;
     document.getElementById('admin-show-names-welcome').checked = eventSettings.showNamesOnWelcome;
-    // Restore font
-    const fontEl = document.getElementById('admin-strip-font');
-    if (fontEl) fontEl.value = eventSettings.stripNameFont || 'Georgia';
-    // Restore color chips
-    document.querySelectorAll('.color-chip').forEach(c => {
-      c.classList.toggle('selected-color', c.getAttribute('data-color') === (eventSettings.stripTextColor || '#C9A84C'));
-    });
     // Restore strip image
     if (eventSettings.stripImage) {
       document.getElementById('strip-image-thumb').src = eventSettings.stripImage;
-      document.getElementById('strip-image-preview').style.display = 'block';
+      document.getElementById('strip-image-preview').style.display = 'flex';
       document.getElementById('strip-preview-img').src = eventSettings.stripImage;
       document.getElementById('strip-preview-img-wrap').style.display = 'block';
     }
     renderPromptEditors();
+    renderSlotEditors();
     renderStats();
     updateAdminPreview();
     updateStripPanelPreview();
@@ -1303,13 +1280,6 @@
     try { localStorage.setItem('ctsDailyStats', JSON.stringify(dailyStats)); } catch(e) {}
   }
 
-  function selectColor(el) {
-    document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected-color'));
-    el.classList.add('selected-color');
-    eventSettings.stripTextColor = el.getAttribute('data-color');
-    updateStripPanelPreview();
-  }
-
   function loadStripImage(input) {
     const file = input.files[0];
     if (!file) return;
@@ -1317,9 +1287,10 @@
     reader.onloadend = () => {
       eventSettings.stripImage = reader.result;
       document.getElementById('strip-image-thumb').src = reader.result;
-      document.getElementById('strip-image-preview').style.display = 'block';
+      document.getElementById('strip-image-preview').style.display = 'flex';
       document.getElementById('strip-preview-img').src = reader.result;
       document.getElementById('strip-preview-img-wrap').style.display = 'block';
+      updateStripPanelPreview();
     };
     reader.readAsDataURL(file);
   }
@@ -1329,24 +1300,93 @@
     document.getElementById('admin-strip-image').value = '';
     document.getElementById('strip-image-preview').style.display = 'none';
     document.getElementById('strip-preview-img-wrap').style.display = 'none';
+    updateStripPanelPreview();
+  }
+
+  const FONTS = [
+    { label: 'Italic Serif (Classic)', value: 'Georgia' },
+    { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+    { label: 'Cinzel (Elegant Caps)', value: "'Cinzel', serif" },
+    { label: 'Great Vibes (Cursive)', value: "'Great Vibes', cursive" },
+    { label: 'Jost (Modern Sans)', value: "'Jost', sans-serif" },
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Courier (Typewriter)', value: "'Courier New', Courier, monospace" },
+  ];
+
+  function renderSlotEditors() {
+    const container = document.getElementById('strip-slots-editor');
+    if (!container) return;
+    container.innerHTML = eventSettings.stripSlots.map((slot, i) => `
+      <div style="border:1px solid rgba(201,168,76,0.2);padding:16px;display:flex;flex-direction:column;gap:10px;opacity:${slot.visible ? 1 : 0.4}">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="admin-label">Line ${i + 1}</span>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" ${slot.visible ? 'checked' : ''} onchange="toggleSlot(${i}, this.checked)" style="accent-color:#C9A84C;width:16px;height:16px;">
+            <span style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);">Show</span>
+          </label>
+        </div>
+        <input type="text" value="${escapeHtml(slot.text)}" placeholder="Enter text..." class="admin-input" oninput="updateSlot(${i}, 'text', this.value)" style="font-size:15px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="flex:2;min-width:140px;display:flex;flex-direction:column;gap:4px;">
+            <label class="admin-label" style="font-size:10px;">Font</label>
+            <select class="admin-input" style="background:#1a1a1a;color:#fff;cursor:pointer;font-size:13px;" onchange="updateSlot(${i}, 'font', this.value)">
+              ${FONTS.map(f => `<option value="${f.value}" ${slot.font === f.value ? 'selected' : ''}>${f.label}</option>`).join('')}
+            </select>
+          </div>
+          <div style="flex:1;min-width:80px;display:flex;flex-direction:column;gap:4px;">
+            <label class="admin-label" style="font-size:10px;">Color</label>
+            <input type="color" value="${slot.color}" oninput="updateSlot(${i}, 'color', this.value)" style="width:100%;height:38px;border:1px solid rgba(201,168,76,0.4);background:none;cursor:pointer;padding:2px;">
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px;">
+            <label class="admin-label" style="font-size:10px;">Size: <span id="size-label-${i}">${slot.size}px</span></label>
+            <input type="range" min="10" max="80" value="${slot.size}" oninput="updateSlot(${i}, 'size', parseInt(this.value)); document.getElementById('size-label-${i}').textContent = this.value + 'px'" style="accent-color:#C9A84C;width:100%;">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:16px;">
+            <button onclick="updateSlot(${i}, 'bold', ${!slot.bold}); renderSlotEditors(); updateStripPanelPreview();" style="font-family:'Cinzel',serif;font-size:12px;padding:6px 14px;border:1px solid rgba(201,168,76,${slot.bold ? 1 : 0.3});background:${slot.bold ? 'rgba(201,168,76,0.2)' : 'transparent'};color:${slot.bold ? '#C9A84C' : 'rgba(255,255,255,0.4)'};cursor:pointer;font-weight:bold;">B</button>
+            <button onclick="updateSlot(${i}, 'italic', ${!slot.italic}); renderSlotEditors(); updateStripPanelPreview();" style="font-family:Georgia,serif;font-style:italic;font-size:12px;padding:6px 14px;border:1px solid rgba(201,168,76,${slot.italic ? 1 : 0.3});background:${slot.italic ? 'rgba(201,168,76,0.2)' : 'transparent'};color:${slot.italic ? '#C9A84C' : 'rgba(255,255,255,0.4)'};cursor:pointer;">I</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateSlot(index, key, value) {
+    eventSettings.stripSlots[index][key] = value;
+    updateStripPanelPreview();
+  }
+
+  function toggleSlot(index, visible) {
+    eventSettings.stripSlots[index].visible = visible;
+    const editors = document.getElementById('strip-slots-editor');
+    if (editors) editors.children[index].style.opacity = visible ? '1' : '0.4';
+    updateStripPanelPreview();
   }
 
   function updateStripPanelPreview() {
-    const names = document.getElementById('admin-couple-names').value || 'The Smiths';
-    const date = document.getElementById('admin-event-date').value || 'June 20, 2026';
-    const font = document.getElementById('admin-strip-font') ? document.getElementById('admin-strip-font').value : 'Georgia';
-    const color = eventSettings.stripTextColor || '#C9A84C';
-    const namesEl = document.getElementById('strip-preview-names');
-    const dateEl = document.getElementById('strip-preview-date');
-    if (namesEl) { namesEl.textContent = names; namesEl.style.fontFamily = font; namesEl.style.color = color; }
-    if (dateEl) dateEl.textContent = date.toUpperCase();
+    const preview = document.getElementById('strip-preview-slots');
+    if (!preview) return;
+    preview.innerHTML = eventSettings.stripSlots
+      .filter(s => s.visible && s.text)
+      .map(s => {
+        const style = [
+          'font-family:' + s.font,
+          'color:' + s.color,
+          'font-size:' + Math.round(s.size * 0.5) + 'px',
+          s.bold ? 'font-weight:bold' : '',
+          s.italic ? 'font-style:italic' : '',
+          'margin:3px 0',
+          'line-height:1.3'
+        ].filter(Boolean).join(';');
+        return '<div style="' + style + '">' + escapeHtml(s.text) + '</div>';
+      }).join('');
   }
 
   function saveEventSettings() {
     eventSettings.coupleNames = document.getElementById('admin-couple-names').value || 'The Smiths';
     eventSettings.eventDate = document.getElementById('admin-event-date').value || 'June 20, 2026';
     eventSettings.showNamesOnWelcome = document.getElementById('admin-show-names-welcome').checked;
-    eventSettings.stripNameFont = document.getElementById('admin-strip-font') ? document.getElementById('admin-strip-font').value : 'Georgia';
 
     const promptInputs = document.querySelectorAll('.admin-prompt-input');
     const newPrompts = [...eventSettings.prompts];
@@ -1356,7 +1396,7 @@
     });
     eventSettings.prompts = newPrompts;
 
-    // Save stripImage separately (can be large)
+    // slots are already updated live via updateSlot()
     const imageToSave = eventSettings.stripImage;
     const settingsToSave = {...eventSettings, stripImage: null};
     try { localStorage.setItem('ctsEventSettings', JSON.stringify(settingsToSave)); } catch(e) {}
@@ -1626,7 +1666,6 @@
   async function captureStrip() {
     const canvas = document.createElement('canvas');
     const padding = 12;
-    const infoPanelH = 160;
 
     // Load all 3 images
     const images = await Promise.all(capturedPhotos.slice(0, 3).map(src => new Promise(resolve => {
@@ -1640,10 +1679,13 @@
     const photoW = Math.min(srcW, 900);
     const photoH = Math.round(photoW * srcH / srcW);
 
-    // Extra height if there's a strip image
-    const extraH = eventSettings.stripImage ? 120 : 0;
+    // Calculate info panel height dynamically
+    const slots = eventSettings.stripSlots || [];
+    const slotHeight = slots.filter(s => s.visible && s.text).reduce((sum, s) => sum + s.size + 14, 0);
+    const imageExtraH = eventSettings.stripImage ? 134 : 0;
+    const dynamicPanelH = slotHeight + imageExtraH + 60;
     canvas.width = photoW + padding * 2;
-    canvas.height = (photoH * 3) + (padding * 4) + infoPanelH + extraH;
+    canvas.height = (photoH * 3) + (padding * 4) + dynamicPanelH;
 
     const ctx = canvas.getContext('2d');
 
@@ -1659,64 +1701,56 @@
 
     // Info panel at bottom
     const panelY = (photoH * 3) + (padding * 4);
-    const nameFont = eventSettings.stripNameFont || 'Georgia';
-    const nameColor = eventSettings.stripTextColor || '#C9A84C';
-    let currentY = panelY + 20;
+    let currentY = panelY + 16;
 
     // Top divider
-    ctx.strokeStyle = nameColor;
-    ctx.globalAlpha = 0.7;
+    const firstColor = (eventSettings.stripSlots && eventSettings.stripSlots[0]) ? eventSettings.stripSlots[0].color : '#C9A84C';
+    ctx.strokeStyle = firstColor;
+    ctx.globalAlpha = 0.6;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(padding + 40, currentY);
     ctx.lineTo(canvas.width - padding - 40, currentY);
     ctx.stroke();
     ctx.globalAlpha = 1;
-    currentY += 20;
+    currentY += 18;
 
     // Optional strip image
     if (eventSettings.stripImage) {
       await new Promise(resolve => {
         const sImg = new Image();
         sImg.onload = () => {
-          const maxW = 160;
-          const maxH = 100;
+          const maxW = 200;
+          const maxH = 120;
           const scale = Math.min(maxW / sImg.naturalWidth, maxH / sImg.naturalHeight);
           const iW = sImg.naturalWidth * scale;
           const iH = sImg.naturalHeight * scale;
           const iX = (canvas.width - iW) / 2;
           ctx.drawImage(sImg, iX, currentY, iW, iH);
-          currentY += iH + 12;
+          currentY += iH + 14;
           resolve();
         };
         sImg.src = eventSettings.stripImage;
       });
     }
 
-    // Couple names
-    ctx.fillStyle = nameColor;
-    ctx.font = 'italic 42px ' + nameFont;
+    // Render each slot
     ctx.textAlign = 'center';
-    ctx.fillText(eventSettings.coupleNames, canvas.width / 2, currentY + 42);
-    currentY += 58;
+    for (const slot of slots) {
+      if (!slot.visible || !slot.text) continue;
+      const fontStyle = (slot.italic ? 'italic ' : '') + (slot.bold ? 'bold ' : '');
+      ctx.font = fontStyle + slot.size + 'px ' + slot.font;
+      ctx.fillStyle = slot.color;
+      ctx.globalAlpha = 1;
+      currentY += slot.size + 6;
+      ctx.fillText(slot.text, canvas.width / 2, currentY);
+      currentY += 8;
+    }
 
-    // Event date
-    ctx.fillStyle = '#999999';
-    ctx.font = '14px Arial, sans-serif';
-    ctx.fillText(eventSettings.eventDate.toUpperCase(), canvas.width / 2, currentY + 14);
-    currentY += 30;
-
-    // Branding
-    ctx.fillStyle = nameColor;
-    ctx.font = 'italic 18px Georgia, serif';
-    ctx.globalAlpha = 0.5;
-    ctx.fillText('Calling the Shots', canvas.width / 2, currentY + 14);
-    ctx.globalAlpha = 1;
-    currentY += 28;
-
+    currentY += 10;
     // Bottom divider
-    ctx.strokeStyle = nameColor;
-    ctx.globalAlpha = 0.4;
+    ctx.strokeStyle = firstColor;
+    ctx.globalAlpha = 0.3;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padding + 80, currentY);
