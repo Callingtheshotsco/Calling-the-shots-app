@@ -1485,39 +1485,34 @@
 
   async function captureStrip() {
     const canvas = document.createElement('canvas');
-    // Use 4:3 aspect ratio per photo to match camera output
-    const photoW = 720;
-    const photoH = 540;
     const padding = 16;
     const footerH = 80;
+
+    // Load all images first so we know their natural dimensions
+    const images = await Promise.all(capturedPhotos.map(src => new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = src;
+    })));
+
+    // Use actual image dimensions for the strip
+    const srcW = images[0].naturalWidth;
+    const srcH = images[0].naturalHeight;
+    const photoW = Math.min(srcW, 900);
+    const photoH = Math.round(photoW * srcH / srcW);
+
     canvas.width = photoW + padding * 2;
     canvas.height = (photoH * 4) + (padding * 5) + footerH;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < capturedPhotos.length; i++) {
-      await new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          const y = padding + i * (photoH + padding);
-          // Compute cover crop to fill photoW x photoH without stretching
-          const srcW = img.naturalWidth;
-          const srcH = img.naturalHeight;
-          const scale = Math.max(photoW / srcW, photoH / srcH);
-          const drawW = srcW * scale;
-          const drawH = srcH * scale;
-          const offsetX = (photoW - drawW) / 2;
-          const offsetY = (photoH - drawH) / 2;
-          ctx.save();
-          ctx.rect(padding, y, photoW, photoH);
-          ctx.clip();
-          ctx.drawImage(img, padding + offsetX, y + offsetY, drawW, drawH);
-          ctx.restore();
-          resolve();
-        };
-        img.src = capturedPhotos[i];
-      });
+
+    for (let i = 0; i < images.length; i++) {
+      const y = padding + i * (photoH + padding);
+      // Draw image at natural aspect ratio — no stretching
+      ctx.drawImage(images[i], padding, y, photoW, photoH);
     }
+
     ctx.fillStyle = '#C9A84C';
     ctx.font = 'italic 28px Georgia, serif';
     ctx.textAlign = 'center';
