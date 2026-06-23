@@ -1339,6 +1339,7 @@
       const base64 = await blobToBase64(blob);
       const fileName = `video-${eventSettings.coupleNames.replace(/[^a-z0-9]/gi, '-')}-${Date.now()}.webm`;
       await fetch(WEBHOOK_URL, {
+        mode: 'no-cors',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1482,6 +1483,7 @@
         const base64 = capturedPhotos[i].split(',')[1];
         const fileName = `photo-${safeNames}-${batchId}-${i + 1}.jpg`;
         await fetch(WEBHOOK_URL, {
+        mode: 'no-cors',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
