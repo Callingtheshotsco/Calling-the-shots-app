@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Calling the Shots</title>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@400;700&family=Jost:wght@300;400;500&family=Dancing+Script:wght@400;700&family=Pacifico&family=Sacramento&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Abril+Fatface&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -963,10 +963,30 @@
         <!-- Image upload -->
         <div style="display:flex;flex-direction:column;gap:8px;">
           <label class="admin-label">Image (optional)</label>
-          <div style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Upload clipart, a logo, monogram, or any icon. Appears at the top of the info panel.</div>
+          <div style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Upload clipart, a logo, monogram, or any icon.</div>
           <input type="file" id="admin-strip-image" accept="image/*" onchange="loadStripImage(this)" style="color:#fff;font-family:'Jost',sans-serif;font-size:13px;">
-          <div id="strip-image-preview" style="display:none;flex-direction:column;gap:8px;margin-top:8px;">
+          <div id="strip-image-preview" style="display:none;flex-direction:column;gap:12px;margin-top:8px;">
             <img id="strip-image-thumb" style="max-height:80px;max-width:200px;object-fit:contain;border:1px solid rgba(201,168,76,0.3);padding:4px;">
+
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label class="admin-label" style="font-size:10px;">Horizontal Position</label>
+              <div style="display:flex;gap:8px;">
+                <button onclick="setImageAlign('left')" id="img-align-left" class="outline-btn" style="flex:1;padding:8px;font-size:11px;">Left</button>
+                <button onclick="setImageAlign('center')" id="img-align-center" class="outline-btn" style="flex:1;padding:8px;font-size:11px;border-color:var(--gold);color:var(--gold);">Center</button>
+                <button onclick="setImageAlign('right')" id="img-align-right" class="outline-btn" style="flex:1;padding:8px;font-size:11px;">Right</button>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label class="admin-label" style="font-size:10px;">Image Size: <span id="img-size-label">100%</span></label>
+              <input type="range" min="20" max="100" value="100" id="img-size-slider" oninput="setImageSize(parseInt(this.value))" style="accent-color:#C9A84C;width:100%;">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label class="admin-label" style="font-size:10px;">Space Below Image: <span id="img-space-label">14px</span></label>
+              <input type="range" min="0" max="60" value="14" id="img-space-slider" oninput="setImageSpacing(parseInt(this.value))" style="accent-color:#C9A84C;width:100%;">
+            </div>
+
             <button onclick="clearStripImage()" class="outline-btn" style="align-self:flex-start;padding:8px 16px;font-size:11px;">Remove Image</button>
           </div>
         </div>
@@ -1126,11 +1146,14 @@
     prompts: [...defaultPrompts],
     stripImage: null,
     stripSlots: [
-      { text: "The Smiths", font: "Georgia", color: "#C9A84C", size: 42, bold: false, italic: true, visible: true },
-      { text: "June 20, 2026", font: "Arial, sans-serif", color: "#999999", size: 14, bold: false, italic: false, visible: true },
-      { text: "Calling the Shots", font: "Georgia", color: "#C9A84C", size: 16, bold: false, italic: true, visible: true },
-      { text: "", font: "Arial, sans-serif", color: "#000000", size: 16, bold: false, italic: false, visible: false }
-    ]
+      { text: "The Smiths", font: "Georgia", color: "#C9A84C", size: 42, bold: false, italic: true, visible: true, spacingAbove: 0, spacingBelow: 4 },
+      { text: "June 20, 2026", font: "Arial, sans-serif", color: "#999999", size: 14, bold: false, italic: false, visible: true, spacingAbove: 0, spacingBelow: 4 },
+      { text: "Calling the Shots", font: "Georgia", color: "#C9A84C", size: 16, bold: false, italic: true, visible: true, spacingAbove: 0, spacingBelow: 0 },
+      { text: "", font: "Arial, sans-serif", color: "#000000", size: 16, bold: false, italic: false, visible: false, spacingAbove: 0, spacingBelow: 0 }
+    ],
+    stripImageAlign: 'center',
+    stripImageSize: 100,
+    stripImageSpacing: 14
   };
 
   let dailyStats = { videos: 0, photos: 0 };
@@ -1303,14 +1326,56 @@
     updateStripPanelPreview();
   }
 
+  function setImageAlign(align) {
+    eventSettings.stripImageAlign = align;
+    ['left','center','right'].forEach(a => {
+      const btn = document.getElementById('img-align-' + a);
+      if (btn) {
+        btn.style.borderColor = a === align ? 'var(--gold)' : 'rgba(201,168,76,0.5)';
+        btn.style.color = a === align ? 'var(--gold)' : 'rgba(201,168,76,0.7)';
+      }
+    });
+    updateStripPanelPreview();
+  }
+
+  function setImageSize(size) {
+    eventSettings.stripImageSize = size;
+    document.getElementById('img-size-label').textContent = size + '%';
+    updateStripPanelPreview();
+  }
+
+  function setImageSpacing(spacing) {
+    eventSettings.stripImageSpacing = spacing;
+    document.getElementById('img-space-label').textContent = spacing + 'px';
+    updateStripPanelPreview();
+  }
+
   const FONTS = [
-    { label: 'Italic Serif (Classic)', value: 'Georgia' },
-    { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
-    { label: 'Cinzel (Elegant Caps)', value: "'Cinzel', serif" },
-    { label: 'Great Vibes (Cursive)', value: "'Great Vibes', cursive" },
-    { label: 'Jost (Modern Sans)', value: "'Jost', sans-serif" },
-    { label: 'Arial', value: 'Arial, sans-serif' },
-    { label: 'Courier (Typewriter)', value: "'Courier New', Courier, monospace" },
+    // Script & Cursive
+    { label: '✦ Great Vibes (Flowing Script)', value: "'Great Vibes', cursive", group: 'Script' },
+    { label: '✦ Dancing Script', value: "'Dancing Script', cursive", group: 'Script' },
+    { label: '✦ Pacifico (Casual Script)', value: "'Pacifico', cursive", group: 'Script' },
+    { label: '✦ Sacramento (Thin Script)', value: "'Sacramento', cursive", group: 'Script' },
+    { label: '✦ Pinyon Script (Formal)', value: "'Pinyon Script', cursive", group: 'Script' },
+    // Serif
+    { label: '⬥ Georgia (Classic Serif)', value: 'Georgia, serif', group: 'Serif' },
+    { label: '⬥ Times New Roman', value: "'Times New Roman', Times, serif", group: 'Serif' },
+    { label: '⬥ Cinzel (Elegant Caps)', value: "'Cinzel', serif", group: 'Serif' },
+    { label: '⬥ Garamond', value: 'Garamond, serif', group: 'Serif' },
+    { label: '⬥ Palatino', value: "'Palatino Linotype', Palatino, serif", group: 'Serif' },
+    { label: '⬥ Book Antiqua', value: "'Book Antiqua', Palatino, serif", group: 'Serif' },
+    // Sans Serif
+    { label: '● Jost (Modern Clean)', value: "'Jost', sans-serif", group: 'Sans' },
+    { label: '● Arial', value: 'Arial, sans-serif', group: 'Sans' },
+    { label: '● Helvetica', value: 'Helvetica, Arial, sans-serif', group: 'Sans' },
+    { label: '● Futura / Century Gothic', value: "'Century Gothic', Futura, sans-serif", group: 'Sans' },
+    // Display & Decorative
+    { label: '★ Cinzel Decorative (Ornate)', value: "'Cinzel Decorative', cursive", group: 'Display' },
+    { label: '★ Playfair Display', value: "'Playfair Display', serif", group: 'Display' },
+    { label: '★ Cormorant Garamond', value: "'Cormorant Garamond', serif", group: 'Display' },
+    { label: '★ Abril Fatface (Bold Display)', value: "'Abril Fatface', cursive", group: 'Display' },
+    // Monospace
+    { label: '◈ Courier (Typewriter)', value: "'Courier New', Courier, monospace", group: 'Mono' },
   ];
 
   function renderSlotEditors() {
@@ -1330,7 +1395,7 @@
           <div style="flex:2;min-width:140px;display:flex;flex-direction:column;gap:4px;">
             <label class="admin-label" style="font-size:10px;">Font</label>
             <select class="admin-input" style="background:#1a1a1a;color:#fff;cursor:pointer;font-size:13px;" onchange="updateSlot(${i}, 'font', this.value)">
-              ${FONTS.map(f => `<option value="${f.value}" ${slot.font === f.value ? 'selected' : ''}>${f.label}</option>`).join('')}
+              ${FONTS.map(f => '<option value="' + f.value + '" ' + (slot.font === f.value ? 'selected' : '') + '>' + f.label + '</option>').join('')}
             </select>
           </div>
           <div style="flex:1;min-width:80px;display:flex;flex-direction:column;gap:4px;">
@@ -1346,6 +1411,16 @@
           <div style="display:flex;gap:8px;margin-top:16px;">
             <button onclick="updateSlot(${i}, 'bold', ${!slot.bold}); renderSlotEditors(); updateStripPanelPreview();" style="font-family:'Cinzel',serif;font-size:12px;padding:6px 14px;border:1px solid rgba(201,168,76,${slot.bold ? 1 : 0.3});background:${slot.bold ? 'rgba(201,168,76,0.2)' : 'transparent'};color:${slot.bold ? '#C9A84C' : 'rgba(255,255,255,0.4)'};cursor:pointer;font-weight:bold;">B</button>
             <button onclick="updateSlot(${i}, 'italic', ${!slot.italic}); renderSlotEditors(); updateStripPanelPreview();" style="font-family:Georgia,serif;font-style:italic;font-size:12px;padding:6px 14px;border:1px solid rgba(201,168,76,${slot.italic ? 1 : 0.3});background:${slot.italic ? 'rgba(201,168,76,0.2)' : 'transparent'};color:${slot.italic ? '#C9A84C' : 'rgba(255,255,255,0.4)'};cursor:pointer;">I</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:100px;">
+            <label class="admin-label" style="font-size:10px;">Space Above: <span id="above-label-${i}">${slot.spacingAbove || 0}px</span></label>
+            <input type="range" min="0" max="60" value="${slot.spacingAbove || 0}" oninput="updateSlot(${i}, 'spacingAbove', parseInt(this.value)); document.getElementById('above-label-${i}').textContent = this.value + 'px'" style="accent-color:#C9A84C;width:100%;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:100px;">
+            <label class="admin-label" style="font-size:10px;">Space Below: <span id="below-label-${i}">${slot.spacingBelow || 0}px</span></label>
+            <input type="range" min="0" max="60" value="${slot.spacingBelow || 0}" oninput="updateSlot(${i}, 'spacingBelow', parseInt(this.value)); document.getElementById('below-label-${i}').textContent = this.value + 'px'" style="accent-color:#C9A84C;width:100%;">
           </div>
         </div>
       </div>
@@ -1373,14 +1448,27 @@
         const style = [
           'font-family:' + s.font,
           'color:' + s.color,
-          'font-size:' + Math.round(s.size * 0.5) + 'px',
+          'font-size:' + Math.round(s.size * 0.45) + 'px',
           s.bold ? 'font-weight:bold' : '',
           s.italic ? 'font-style:italic' : '',
-          'margin:3px 0',
-          'line-height:1.3'
+          'margin-top:' + Math.round((s.spacingAbove || 0) * 0.45) + 'px',
+          'margin-bottom:' + Math.round((s.spacingBelow || 0) * 0.45) + 'px',
+          'line-height:1.2',
+          'display:block'
         ].filter(Boolean).join(';');
-        return '<div style="' + style + '">' + escapeHtml(s.text) + '</div>';
+        return '<span style="' + style + '">' + escapeHtml(s.text) + '</span>';
       }).join('');
+
+    // Update image preview alignment
+    const imgEl = document.getElementById('strip-preview-img');
+    if (imgEl) {
+      const align = eventSettings.stripImageAlign || 'center';
+      imgEl.style.display = 'block';
+      imgEl.style.marginLeft = align === 'center' ? 'auto' : (align === 'right' ? 'auto' : '0');
+      imgEl.style.marginRight = align === 'center' ? 'auto' : (align === 'left' ? 'auto' : '0');
+      const size = (eventSettings.stripImageSize || 100);
+      imgEl.style.maxWidth = size + '%';
+    }
   }
 
   function saveEventSettings() {
@@ -1681,7 +1769,7 @@
 
     // Calculate info panel height dynamically
     const slots = eventSettings.stripSlots || [];
-    const slotHeight = slots.filter(s => s.visible && s.text).reduce((sum, s) => sum + s.size + 14, 0);
+    const slotHeight = slots.filter(s => s.visible && s.text).reduce((sum, s) => sum + s.size + (s.spacingAbove || 0) + (s.spacingBelow || 0) + 4, 0);
     const imageExtraH = eventSettings.stripImage ? 134 : 0;
     const dynamicPanelH = slotHeight + imageExtraH + 60;
     canvas.width = photoW + padding * 2;
@@ -1720,14 +1808,18 @@
       await new Promise(resolve => {
         const sImg = new Image();
         sImg.onload = () => {
-          const maxW = 200;
-          const maxH = 120;
+          const sizePct = (eventSettings.stripImageSize || 100) / 100;
+          const maxW = (canvas.width - padding * 2) * sizePct;
+          const maxH = 180 * sizePct;
           const scale = Math.min(maxW / sImg.naturalWidth, maxH / sImg.naturalHeight);
           const iW = sImg.naturalWidth * scale;
           const iH = sImg.naturalHeight * scale;
-          const iX = (canvas.width - iW) / 2;
+          const align = eventSettings.stripImageAlign || 'center';
+          let iX = padding;
+          if (align === 'center') iX = (canvas.width - iW) / 2;
+          else if (align === 'right') iX = canvas.width - padding - iW;
           ctx.drawImage(sImg, iX, currentY, iW, iH);
-          currentY += iH + 14;
+          currentY += iH + (eventSettings.stripImageSpacing || 14);
           resolve();
         };
         sImg.src = eventSettings.stripImage;
@@ -1742,9 +1834,9 @@
       ctx.font = fontStyle + slot.size + 'px ' + slot.font;
       ctx.fillStyle = slot.color;
       ctx.globalAlpha = 1;
-      currentY += slot.size + 6;
+      currentY += (slot.spacingAbove || 0) + slot.size;
       ctx.fillText(slot.text, canvas.width / 2, currentY);
-      currentY += 8;
+      currentY += (slot.spacingBelow || 0) + 4;
     }
 
     currentY += 10;
