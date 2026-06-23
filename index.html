@@ -955,58 +955,40 @@
         <button class="outline-btn" onclick="resetStats()" style="align-self:flex-start;margin-top:4px;">Reset Counts</button>
       </div>
 
-      <!-- Strip Design Section -->
+      <!-- Strip Info Panel Section -->
       <div style="display:flex;flex-direction:column;gap:16px;border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;">
         <div class="admin-section-label">Strip Info Panel</div>
-        <div class="admin-label" style="text-transform:none;letter-spacing:0;font-size:13px;opacity:0.6;">Fully customize every line of text on the bottom of the strip.</div>
-
-        <!-- Image upload -->
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="admin-label">Image (optional)</label>
-          <div style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Upload clipart, a logo, monogram, or any icon.</div>
-          <input type="file" id="admin-strip-image" accept="image/*" onchange="loadStripImage(this)" style="color:#fff;font-family:'Jost',sans-serif;font-size:13px;">
-          <div id="strip-image-preview" style="display:none;flex-direction:column;gap:12px;margin-top:8px;">
-            <img id="strip-image-thumb" style="max-height:80px;max-width:200px;object-fit:contain;border:1px solid rgba(201,168,76,0.3);padding:4px;">
-
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <label class="admin-label" style="font-size:10px;">Horizontal Position</label>
-              <div style="display:flex;gap:8px;">
-                <button onclick="setImageAlign('left')" id="img-align-left" class="outline-btn" style="flex:1;padding:8px;font-size:11px;">Left</button>
-                <button onclick="setImageAlign('center')" id="img-align-center" class="outline-btn" style="flex:1;padding:8px;font-size:11px;border-color:var(--gold);color:var(--gold);">Center</button>
-                <button onclick="setImageAlign('right')" id="img-align-right" class="outline-btn" style="flex:1;padding:8px;font-size:11px;">Right</button>
-              </div>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <label class="admin-label" style="font-size:10px;">Image Size: <span id="img-size-label">100%</span></label>
-              <input type="range" min="20" max="100" value="100" id="img-size-slider" oninput="setImageSize(parseInt(this.value))" style="accent-color:#C9A84C;width:100%;">
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <label class="admin-label" style="font-size:10px;">Space Below Image: <span id="img-space-label">14px</span></label>
-              <input type="range" min="0" max="60" value="14" id="img-space-slider" oninput="setImageSpacing(parseInt(this.value))" style="accent-color:#C9A84C;width:100%;">
-            </div>
-
-            <button onclick="clearStripImage()" class="outline-btn" style="align-self:flex-start;padding:8px 16px;font-size:11px;">Remove Image</button>
-          </div>
+        <div style="font-family:'Jost',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;">
+          Design your info panel in <strong style="color:rgba(255,255,255,0.8);">Canva</strong> with your couple names, date, clipart, and any fonts/colors you want. Export as PNG and upload it here — it will appear at the bottom of every photo strip.
         </div>
 
-        <!-- Text slots -->
-        <div id="strip-slots-editor" style="display:flex;flex-direction:column;gap:20px;"></div>
+        <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);padding:14px;font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.7;">
+          💡 Canva tip: Set your canvas size to <strong style="color:rgba(255,255,255,0.7);">900 × 400 px</strong> for best results on the strip.
+        </div>
 
-        <!-- Live Preview -->
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="admin-label">Live Preview</label>
-          <div id="strip-panel-preview" style="background:#fff;padding:20px 24px;text-align:center;max-width:280px;min-height:80px;">
-            <div id="strip-preview-img-wrap" style="display:none;margin-bottom:10px;">
-              <img id="strip-preview-img" style="max-height:70px;max-width:160px;object-fit:contain;">
-            </div>
-            <div id="strip-preview-slots"></div>
+          <label class="admin-label">Upload Info Panel Image</label>
+          <input type="file" id="admin-strip-image" accept="image/*" onchange="loadStripImage(this)" style="color:#fff;font-family:'Jost',sans-serif;font-size:13px;">
+        </div>
+
+        <div id="strip-image-preview" style="display:none;flex-direction:column;gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label class="admin-label" style="font-size:10px;">Size: <span id="img-size-label">100%</span></label>
+            <input type="range" min="40" max="100" value="100" id="img-size-slider" oninput="setImageSize(parseInt(this.value))" style="accent-color:#C9A84C;width:100%;">
           </div>
+
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label class="admin-label" style="font-size:10px;">Preview</label>
+            <div style="background:#fff;padding:12px;text-align:center;">
+              <img id="strip-image-thumb" style="max-width:100%;object-fit:contain;display:block;margin:0 auto;">
+            </div>
+          </div>
+
+          <button onclick="clearStripImage()" class="outline-btn" style="align-self:flex-start;padding:8px 16px;font-size:11px;">Remove Image</button>
         </div>
       </div>
 
-      <div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:24px;display:flex;flex-direction:column;gap:12px;align-items:center;">
+            <div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:24px;display:flex;flex-direction:column;gap:12px;align-items:center;">
         <button class="gold-btn" onclick="saveEventSettings()" style="width:100%;">Save Event Settings</button>
         <div id="admin-saved-msg" style="text-align:center;font-family:'Jost',sans-serif;font-size:13px;color:var(--gold);opacity:0;transition:opacity 0.3s ease;">✓ Saved!</div>
       </div>
@@ -1145,15 +1127,7 @@
     showNamesOnWelcome: false,
     prompts: [...defaultPrompts],
     stripImage: null,
-    stripSlots: [
-      { text: "The Smiths", font: "Georgia", color: "#C9A84C", size: 42, bold: false, italic: true, visible: true, spacingAbove: 0, spacingBelow: 4 },
-      { text: "June 20, 2026", font: "Arial, sans-serif", color: "#999999", size: 14, bold: false, italic: false, visible: true, spacingAbove: 0, spacingBelow: 4 },
-      { text: "Calling the Shots", font: "Georgia", color: "#C9A84C", size: 16, bold: false, italic: true, visible: true, spacingAbove: 0, spacingBelow: 0 },
-      { text: "", font: "Arial, sans-serif", color: "#000000", size: 16, bold: false, italic: false, visible: false, spacingAbove: 0, spacingBelow: 0 }
-    ],
-    stripImageAlign: 'center',
-    stripImageSize: 100,
-    stripImageSpacing: 14
+    stripImageSize: 100
   };
 
   let dailyStats = { videos: 0, photos: 0 };
@@ -1239,18 +1213,17 @@
     document.getElementById('admin-couple-names').value = eventSettings.coupleNames;
     document.getElementById('admin-event-date').value = eventSettings.eventDate;
     document.getElementById('admin-show-names-welcome').checked = eventSettings.showNamesOnWelcome;
-    // Restore strip image
     if (eventSettings.stripImage) {
       document.getElementById('strip-image-thumb').src = eventSettings.stripImage;
       document.getElementById('strip-image-preview').style.display = 'flex';
-      document.getElementById('strip-preview-img').src = eventSettings.stripImage;
-      document.getElementById('strip-preview-img-wrap').style.display = 'block';
+      const slider = document.getElementById('img-size-slider');
+      const label = document.getElementById('img-size-label');
+      if (slider) slider.value = eventSettings.stripImageSize || 100;
+      if (label) label.textContent = (eventSettings.stripImageSize || 100) + '%';
     }
     renderPromptEditors();
-    renderSlotEditors();
     renderStats();
     updateAdminPreview();
-    updateStripPanelPreview();
     showScreen('admin-panel');
   }
 
@@ -1311,9 +1284,6 @@
       eventSettings.stripImage = reader.result;
       document.getElementById('strip-image-thumb').src = reader.result;
       document.getElementById('strip-image-preview').style.display = 'flex';
-      document.getElementById('strip-preview-img').src = reader.result;
-      document.getElementById('strip-preview-img-wrap').style.display = 'block';
-      updateStripPanelPreview();
     };
     reader.readAsDataURL(file);
   }
@@ -1322,156 +1292,16 @@
     eventSettings.stripImage = null;
     document.getElementById('admin-strip-image').value = '';
     document.getElementById('strip-image-preview').style.display = 'none';
-    document.getElementById('strip-preview-img-wrap').style.display = 'none';
-    updateStripPanelPreview();
-  }
-
-  function setImageAlign(align) {
-    eventSettings.stripImageAlign = align;
-    ['left','center','right'].forEach(a => {
-      const btn = document.getElementById('img-align-' + a);
-      if (btn) {
-        btn.style.borderColor = a === align ? 'var(--gold)' : 'rgba(201,168,76,0.5)';
-        btn.style.color = a === align ? 'var(--gold)' : 'rgba(201,168,76,0.7)';
-      }
-    });
-    updateStripPanelPreview();
   }
 
   function setImageSize(size) {
     eventSettings.stripImageSize = size;
     document.getElementById('img-size-label').textContent = size + '%';
-    updateStripPanelPreview();
+    const thumb = document.getElementById('strip-image-thumb');
+    if (thumb) thumb.style.maxWidth = size + '%';
   }
 
-  function setImageSpacing(spacing) {
-    eventSettings.stripImageSpacing = spacing;
-    document.getElementById('img-space-label').textContent = spacing + 'px';
-    updateStripPanelPreview();
-  }
-
-  const FONTS = [
-    // Script & Cursive
-    { label: '✦ Great Vibes (Flowing Script)', value: "'Great Vibes', cursive", group: 'Script' },
-    { label: '✦ Dancing Script', value: "'Dancing Script', cursive", group: 'Script' },
-    { label: '✦ Pacifico (Casual Script)', value: "'Pacifico', cursive", group: 'Script' },
-    { label: '✦ Sacramento (Thin Script)', value: "'Sacramento', cursive", group: 'Script' },
-    { label: '✦ Pinyon Script (Formal)', value: "'Pinyon Script', cursive", group: 'Script' },
-    // Serif
-    { label: '⬥ Georgia (Classic Serif)', value: 'Georgia, serif', group: 'Serif' },
-    { label: '⬥ Times New Roman', value: "'Times New Roman', Times, serif", group: 'Serif' },
-    { label: '⬥ Cinzel (Elegant Caps)', value: "'Cinzel', serif", group: 'Serif' },
-    { label: '⬥ Garamond', value: 'Garamond, serif', group: 'Serif' },
-    { label: '⬥ Palatino', value: "'Palatino Linotype', Palatino, serif", group: 'Serif' },
-    { label: '⬥ Book Antiqua', value: "'Book Antiqua', Palatino, serif", group: 'Serif' },
-    // Sans Serif
-    { label: '● Jost (Modern Clean)', value: "'Jost', sans-serif", group: 'Sans' },
-    { label: '● Arial', value: 'Arial, sans-serif', group: 'Sans' },
-    { label: '● Helvetica', value: 'Helvetica, Arial, sans-serif', group: 'Sans' },
-    { label: '● Futura / Century Gothic', value: "'Century Gothic', Futura, sans-serif", group: 'Sans' },
-    // Display & Decorative
-    { label: '★ Cinzel Decorative (Ornate)', value: "'Cinzel Decorative', cursive", group: 'Display' },
-    { label: '★ Playfair Display', value: "'Playfair Display', serif", group: 'Display' },
-    { label: '★ Cormorant Garamond', value: "'Cormorant Garamond', serif", group: 'Display' },
-    { label: '★ Abril Fatface (Bold Display)', value: "'Abril Fatface', cursive", group: 'Display' },
-    // Monospace
-    { label: '◈ Courier (Typewriter)', value: "'Courier New', Courier, monospace", group: 'Mono' },
-  ];
-
-  function renderSlotEditors() {
-    const container = document.getElementById('strip-slots-editor');
-    if (!container) return;
-    container.innerHTML = eventSettings.stripSlots.map((slot, i) => `
-      <div style="border:1px solid rgba(201,168,76,0.2);padding:16px;display:flex;flex-direction:column;gap:10px;opacity:${slot.visible ? 1 : 0.4}">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <span class="admin-label">Line ${i + 1}</span>
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" ${slot.visible ? 'checked' : ''} onchange="toggleSlot(${i}, this.checked)" style="accent-color:#C9A84C;width:16px;height:16px;">
-            <span style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);">Show</span>
-          </label>
-        </div>
-        <input type="text" value="${escapeHtml(slot.text)}" placeholder="Enter text..." class="admin-input" oninput="updateSlot(${i}, 'text', this.value)" style="font-size:15px;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <div style="flex:2;min-width:140px;display:flex;flex-direction:column;gap:4px;">
-            <label class="admin-label" style="font-size:10px;">Font</label>
-            <select class="admin-input" style="background:#1a1a1a;color:#fff;cursor:pointer;font-size:13px;" onchange="updateSlot(${i}, 'font', this.value)">
-              ${FONTS.map(f => '<option value="' + f.value + '" ' + (slot.font === f.value ? 'selected' : '') + '>' + f.label + '</option>').join('')}
-            </select>
-          </div>
-          <div style="flex:1;min-width:80px;display:flex;flex-direction:column;gap:4px;">
-            <label class="admin-label" style="font-size:10px;">Color</label>
-            <input type="color" value="${slot.color}" oninput="updateSlot(${i}, 'color', this.value)" style="width:100%;height:38px;border:1px solid rgba(201,168,76,0.4);background:none;cursor:pointer;padding:2px;">
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px;">
-            <label class="admin-label" style="font-size:10px;">Size: <span id="size-label-${i}">${slot.size}px</span></label>
-            <input type="range" min="10" max="80" value="${slot.size}" oninput="updateSlot(${i}, 'size', parseInt(this.value)); document.getElementById('size-label-${i}').textContent = this.value + 'px'" style="accent-color:#C9A84C;width:100%;">
-          </div>
-          <div style="display:flex;gap:8px;margin-top:16px;">
-            <button onclick="updateSlot(${i}, 'bold', ${!slot.bold}); renderSlotEditors(); updateStripPanelPreview();" style="font-family:'Cinzel',serif;font-size:12px;padding:6px 14px;border:1px solid rgba(201,168,76,${slot.bold ? 1 : 0.3});background:${slot.bold ? 'rgba(201,168,76,0.2)' : 'transparent'};color:${slot.bold ? '#C9A84C' : 'rgba(255,255,255,0.4)'};cursor:pointer;font-weight:bold;">B</button>
-            <button onclick="updateSlot(${i}, 'italic', ${!slot.italic}); renderSlotEditors(); updateStripPanelPreview();" style="font-family:Georgia,serif;font-style:italic;font-size:12px;padding:6px 14px;border:1px solid rgba(201,168,76,${slot.italic ? 1 : 0.3});background:${slot.italic ? 'rgba(201,168,76,0.2)' : 'transparent'};color:${slot.italic ? '#C9A84C' : 'rgba(255,255,255,0.4)'};cursor:pointer;">I</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:100px;">
-            <label class="admin-label" style="font-size:10px;">Space Above: <span id="above-label-${i}">${slot.spacingAbove || 0}px</span></label>
-            <input type="range" min="0" max="60" value="${slot.spacingAbove || 0}" oninput="updateSlot(${i}, 'spacingAbove', parseInt(this.value)); document.getElementById('above-label-${i}').textContent = this.value + 'px'" style="accent-color:#C9A84C;width:100%;">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:100px;">
-            <label class="admin-label" style="font-size:10px;">Space Below: <span id="below-label-${i}">${slot.spacingBelow || 0}px</span></label>
-            <input type="range" min="0" max="60" value="${slot.spacingBelow || 0}" oninput="updateSlot(${i}, 'spacingBelow', parseInt(this.value)); document.getElementById('below-label-${i}').textContent = this.value + 'px'" style="accent-color:#C9A84C;width:100%;">
-          </div>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  function updateSlot(index, key, value) {
-    eventSettings.stripSlots[index][key] = value;
-    updateStripPanelPreview();
-  }
-
-  function toggleSlot(index, visible) {
-    eventSettings.stripSlots[index].visible = visible;
-    const editors = document.getElementById('strip-slots-editor');
-    if (editors) editors.children[index].style.opacity = visible ? '1' : '0.4';
-    updateStripPanelPreview();
-  }
-
-  function updateStripPanelPreview() {
-    const preview = document.getElementById('strip-preview-slots');
-    if (!preview) return;
-    preview.innerHTML = eventSettings.stripSlots
-      .filter(s => s.visible && s.text)
-      .map(s => {
-        const style = [
-          'font-family:' + s.font,
-          'color:' + s.color,
-          'font-size:' + Math.round(s.size * 0.45) + 'px',
-          s.bold ? 'font-weight:bold' : '',
-          s.italic ? 'font-style:italic' : '',
-          'margin-top:' + Math.round((s.spacingAbove || 0) * 0.45) + 'px',
-          'margin-bottom:' + Math.round((s.spacingBelow || 0) * 0.45) + 'px',
-          'line-height:1.2',
-          'display:block'
-        ].filter(Boolean).join(';');
-        return '<span style="' + style + '">' + escapeHtml(s.text) + '</span>';
-      }).join('');
-
-    // Update image preview alignment
-    const imgEl = document.getElementById('strip-preview-img');
-    if (imgEl) {
-      const align = eventSettings.stripImageAlign || 'center';
-      imgEl.style.display = 'block';
-      imgEl.style.marginLeft = align === 'center' ? 'auto' : (align === 'right' ? 'auto' : '0');
-      imgEl.style.marginRight = align === 'center' ? 'auto' : (align === 'left' ? 'auto' : '0');
-      const size = (eventSettings.stripImageSize || 100);
-      imgEl.style.maxWidth = size + '%';
-    }
-  }
-
-  function saveEventSettings() {
+    function saveEventSettings() {
     eventSettings.coupleNames = document.getElementById('admin-couple-names').value || 'The Smiths';
     eventSettings.eventDate = document.getElementById('admin-event-date').value || 'June 20, 2026';
     eventSettings.showNamesOnWelcome = document.getElementById('admin-show-names-welcome').checked;
@@ -1484,7 +1314,6 @@
     });
     eventSettings.prompts = newPrompts;
 
-    // slots are already updated live via updateSlot()
     const imageToSave = eventSettings.stripImage;
     const settingsToSave = {...eventSettings, stripImage: null};
     try { localStorage.setItem('ctsEventSettings', JSON.stringify(settingsToSave)); } catch(e) {}
@@ -1494,7 +1323,6 @@
     applyWelcomeBranding();
     applyPromptsToVideoScreen();
     updateAdminPreview();
-    updateStripPanelPreview();
 
     const msg = document.getElementById('admin-saved-msg');
     msg.style.opacity = '1';
@@ -1752,7 +1580,6 @@
   }
 
   async function captureStrip() {
-    const canvas = document.createElement('canvas');
     const padding = 12;
 
     // Load all 3 images
@@ -1767,17 +1594,26 @@
     const photoW = Math.min(srcW, 900);
     const photoH = Math.round(photoW * srcH / srcW);
 
-    // Calculate info panel height dynamically
-    const slots = eventSettings.stripSlots || [];
-    const slotHeight = slots.filter(s => s.visible && s.text).reduce((sum, s) => sum + s.size + (s.spacingAbove || 0) + (s.spacingBelow || 0) + 4, 0);
-    const imageExtraH = eventSettings.stripImage ? 134 : 0;
-    const dynamicPanelH = slotHeight + imageExtraH + 60;
+    // Calculate info panel height
+    let infoPanelH = 20; // min padding
+    let stripImg = null;
+    if (eventSettings.stripImage) {
+      stripImg = await new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = eventSettings.stripImage;
+      });
+      const sizePct = (eventSettings.stripImageSize || 100) / 100;
+      const maxW = (photoW) * sizePct;
+      const scale = Math.min(maxW / stripImg.naturalWidth, 400 / stripImg.naturalHeight);
+      infoPanelH = Math.round(stripImg.naturalHeight * scale) + 24;
+    }
+
+    const canvas = document.createElement('canvas');
     canvas.width = photoW + padding * 2;
-    canvas.height = (photoH * 3) + (padding * 4) + dynamicPanelH;
+    canvas.height = (photoH * 3) + (padding * 4) + infoPanelH;
 
     const ctx = canvas.getContext('2d');
-
-    // White background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -1787,73 +1623,22 @@
       ctx.drawImage(images[i], padding, y, photoW, photoH);
     }
 
-    // Info panel at bottom
-    const panelY = (photoH * 3) + (padding * 4);
-    let currentY = panelY + 16;
-
-    // Top divider
-    const firstColor = (eventSettings.stripSlots && eventSettings.stripSlots[0]) ? eventSettings.stripSlots[0].color : '#C9A84C';
-    ctx.strokeStyle = firstColor;
-    ctx.globalAlpha = 0.6;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(padding + 40, currentY);
-    ctx.lineTo(canvas.width - padding - 40, currentY);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-    currentY += 18;
-
-    // Optional strip image
-    if (eventSettings.stripImage) {
-      await new Promise(resolve => {
-        const sImg = new Image();
-        sImg.onload = () => {
-          const sizePct = (eventSettings.stripImageSize || 100) / 100;
-          const maxW = (canvas.width - padding * 2) * sizePct;
-          const maxH = 180 * sizePct;
-          const scale = Math.min(maxW / sImg.naturalWidth, maxH / sImg.naturalHeight);
-          const iW = sImg.naturalWidth * scale;
-          const iH = sImg.naturalHeight * scale;
-          const align = eventSettings.stripImageAlign || 'center';
-          let iX = padding;
-          if (align === 'center') iX = (canvas.width - iW) / 2;
-          else if (align === 'right') iX = canvas.width - padding - iW;
-          ctx.drawImage(sImg, iX, currentY, iW, iH);
-          currentY += iH + (eventSettings.stripImageSpacing || 14);
-          resolve();
-        };
-        sImg.src = eventSettings.stripImage;
-      });
+    // Draw info panel image if uploaded
+    if (stripImg) {
+      const panelY = (photoH * 3) + (padding * 4);
+      const sizePct = (eventSettings.stripImageSize || 100) / 100;
+      const maxW = photoW * sizePct;
+      const scale = Math.min(maxW / stripImg.naturalWidth, 400 / stripImg.naturalHeight);
+      const iW = stripImg.naturalWidth * scale;
+      const iH = stripImg.naturalHeight * scale;
+      const iX = (canvas.width - iW) / 2;
+      ctx.drawImage(stripImg, iX, panelY + 10, iW, iH);
     }
-
-    // Render each slot
-    ctx.textAlign = 'center';
-    for (const slot of slots) {
-      if (!slot.visible || !slot.text) continue;
-      const fontStyle = (slot.italic ? 'italic ' : '') + (slot.bold ? 'bold ' : '');
-      ctx.font = fontStyle + slot.size + 'px ' + slot.font;
-      ctx.fillStyle = slot.color;
-      ctx.globalAlpha = 1;
-      currentY += (slot.spacingAbove || 0) + slot.size;
-      ctx.fillText(slot.text, canvas.width / 2, currentY);
-      currentY += (slot.spacingBelow || 0) + 4;
-    }
-
-    currentY += 10;
-    // Bottom divider
-    ctx.strokeStyle = firstColor;
-    ctx.globalAlpha = 0.3;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding + 80, currentY);
-    ctx.lineTo(canvas.width - padding - 80, currentY);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
 
     return canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
   }
 
-  async function uploadPhotos(phone) {
+    async function uploadPhotos(phone) {
     try {
       const safeNames = eventSettings.coupleNames.replace(/[^a-z0-9]/gi, '-');
       const batchId = Date.now();
